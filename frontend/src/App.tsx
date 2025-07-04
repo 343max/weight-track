@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import WeightTracker from './components/WeightTracker'
-import { User, WeightEntry } from './types'
+import { useState, useEffect, useRef } from "react"
+import WeightTracker from "./components/WeightTracker"
+import type { User, WeightEntry } from "./types"
 
 interface AppData {
   users: User[]
@@ -16,21 +16,21 @@ function App() {
 
   const fetchData = async () => {
     try {
-      const secret = new URLSearchParams(window.location.search).get('secret')
+      const secret = new URLSearchParams(window.location.search).get("secret")
       if (!secret) {
-        throw new Error('Secret parameter is required')
+        throw new Error("Secret parameter is required")
       }
 
       const response = await fetch(`/api/data?secret=${secret}`)
       if (!response.ok) {
-        throw new Error('Failed to fetch data')
+        throw new Error("Failed to fetch data")
       }
 
       const appData = await response.json()
       setData(appData)
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : "An error occurred")
     } finally {
       setLoading(false)
     }
@@ -38,15 +38,15 @@ function App() {
 
   const saveWeight = async (userId: number, date: string, weight: number) => {
     try {
-      const secret = new URLSearchParams(window.location.search).get('secret')
+      const secret = new URLSearchParams(window.location.search).get("secret")
       if (!secret) {
-        throw new Error('Secret parameter is required')
+        throw new Error("Secret parameter is required")
       }
 
       const response = await fetch(`/api/weight?secret=${secret}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           userId,
@@ -56,7 +56,7 @@ function App() {
       })
 
       if (!response.ok) {
-        throw new Error('Failed to save weight')
+        throw new Error("Failed to save weight")
       }
 
       const result = await response.json()
@@ -69,29 +69,29 @@ function App() {
   useEffect(() => {
     fetchData()
 
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
     const wsUrl = `${protocol}//${window.location.hostname}:8080`
-    
+
     const ws = new WebSocket(wsUrl)
     wsRef.current = ws
 
     ws.onopen = () => {
-      console.log('WebSocket connected')
+      console.log("WebSocket connected")
     }
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      if (message.type === 'weight_updated') {
+      if (message.type === "weight_updated") {
         fetchData()
       }
     }
 
     ws.onclose = () => {
-      console.log('WebSocket disconnected')
+      console.log("WebSocket disconnected")
     }
 
     ws.onerror = (error) => {
-      console.error('WebSocket error:', error)
+      console.error("WebSocket error:", error)
     }
 
     return () => {
