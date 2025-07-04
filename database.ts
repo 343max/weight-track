@@ -104,6 +104,12 @@ export class WeightTracker {
     return result.last_date;
   }
 
+  getFirstEntryDate(): string | null {
+    const stmt = this.db.prepare("SELECT MIN(date) as first_date FROM weights");
+    const result = stmt.get() as { first_date: string | null };
+    return result.first_date;
+  }
+
   close() {
     this.db.close();
   }

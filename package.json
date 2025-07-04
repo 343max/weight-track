@@ -8,7 +8,8 @@
     "dev:server": "bun --watch server.ts",
     "dev:frontend": "vite --host",
     "build": "vite build",
-    "start": "bun server.ts"
+    "start": "bun server.ts",
+    "test": "bun test"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",
