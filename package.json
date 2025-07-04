@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "concurrently \"bun run dev:server\" \"bun run dev:frontend\"",
     "dev:server": "bun --watch server.ts",
-    "dev:frontend": "vite",
+    "dev:frontend": "vite --host",
     "build": "vite build",
     "start": "bun server.ts"
   },

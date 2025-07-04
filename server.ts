@@ -9,8 +9,8 @@ const APP_SECRET = process.env.APP_SECRET;
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/tracker.db";
 const PORT = process.env.PORT || 3000;
 
-if (!APP_SECRET) {
-  console.error("APP_SECRET environment variable is required");
+if (APP_SECRET === undefined) {
+  console.error("APP_SECRET environment variable is required (can be empty)");
   process.exit(1);
 }
 
