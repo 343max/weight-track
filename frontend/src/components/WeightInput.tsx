@@ -100,6 +100,10 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
 
   const handleFocus = () => {
     setIsEditing(true)
+    // Select all text when focusing
+    if (inputRef.current) {
+      inputRef.current.select()
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
