@@ -98,13 +98,6 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     handleSave(value)
   }
 
-  const handleFocus = () => {
-    setIsEditing(true)
-    // Select all text when focusing
-    if (inputRef.current) {
-      inputRef.current.select()
-    }
-  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -113,7 +106,7 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   }
 
   const renderWeightChange = () => {
-    if (!displayInfo || !displayInfo.previousWeight || isEditing) {
+    if (!displayInfo || !displayInfo.previousWeight) {
       return null
     }
 
@@ -122,45 +115,74 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     const change = current - previous
 
     if (change === 0) {
-      return <span className="text-gray-500 dark:text-gray-400 text-xs ml-1">(–)</span>
+      return <div className="text-gray-500 dark:text-gray-400 text-xs text-center mt-1">(–)</div>
     }
 
     const isLoss = change < 0
-    const colorClass = isLoss ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
+    const colorClass = isLoss ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
     const arrow = isLoss ? '↓' : '↑'
     const absChange = Math.abs(change).toFixed(1)
 
     return (
-      <span className={`${colorClass} text-xs ml-1`}>
-        ({arrow} {absChange})
-      </span>
+      <div className={`${colorClass} text-xs text-center mt-1 font-medium`}>
+        {arrow} {absChange}
+      </div>
+    )
+  }
+
+  const handleClick = () => {
+    setIsEditing(true)
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus()
+        inputRef.current.select()
+      }
+    }, 0)
+  }
+
+  if (isEditing) {
+    return (
+      <div className="flex flex-col items-center justify-center p-2">
+        <input
+          ref={inputRef}
+          type="number"
+          value={value}
+          onChange={handleInputChange}
+          onBlur={handleBlur}
+          onKeyDown={handleKeyDown}
+          className={`
+            weight-input text-center text-sm p-2 border-2 rounded-lg w-20
+            bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600
+            text-gray-900 dark:text-gray-100
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+            shadow-sm
+            ${showShake ? 'shake' : ''}
+            ${isSaving ? 'opacity-50' : ''}
+          `}
+          placeholder="--"
+          step="0.1"
+          min="0"
+          disabled={isSaving}
+          autoFocus
+        />
+      </div>
     )
   }
 
   return (
-    <div className="flex items-center justify-center">
-      <input
-        ref={inputRef}
-        type="number"
-        value={value}
-        onChange={handleInputChange}
-        onBlur={handleBlur}
-        onFocus={handleFocus}
-        onKeyDown={handleKeyDown}
-        className={`
-          weight-input text-center text-sm p-1 border rounded
-          bg-transparent border-gray-300 dark:border-gray-600
-          text-gray-900 dark:text-gray-100
-          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
-          ${showShake ? 'shake' : ''}
-          ${isSaving ? 'opacity-50' : ''}
-        `}
-        placeholder="--"
-        step="0.1"
-        min="0"
-        disabled={isSaving}
-      />
-      {renderWeightChange()}
+    <div 
+      className="flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors min-h-[60px]"
+      onClick={handleClick}
+    >
+      <div className="text-center">
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {initialWeight !== null ? initialWeight.toFixed(1) : '--'}
+        </div>
+        {renderWeightChange()}
+      </div>
+      {isSaving && (
+        <div className="text-xs text-blue-500 dark:text-blue-400 mt-1">Saving...</div>
+      )}
     </div>
   )
 }

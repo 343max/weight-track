@@ -32,12 +32,44 @@
   }
   
   .weight-col {
-    width: 80px;
-    min-width: 80px;
-    max-width: 80px;
+    width: 100px;
+    min-width: 100px;
+    max-width: 100px;
   }
   
   .no-zoom {
     touch-action: manipulation;
+  }
+  
+  /* Custom scrollbar for webkit browsers */
+  .overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+  }
+  
+  .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+  }
+  
+  /* Dark mode scrollbar */
+  .dark .overflow-x-auto::-webkit-scrollbar-track {
+    background: #374151;
+  }
+  
+  .dark .overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #6b7280;
+  }
+  
+  .dark .overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
   }
 }
