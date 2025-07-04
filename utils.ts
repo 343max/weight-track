@@ -1,9 +1,10 @@
 export function getLastFriday(date: Date = new Date()): string {
   const day = date.getDay();
+  // Friday is day 5. Calculate days to subtract to get to the most recent Friday
   const daysToSubtract = day >= 5 ? day - 5 : day + 2;
   const friday = new Date(date);
   friday.setDate(date.getDate() - daysToSubtract);
-  return friday.toISOString().split('T')[0];
+  return friday.toISOString().split('T')[0]!;
 }
 
 export function getAllFridaysBetween(startDate: string, endDate: string): string[] {
@@ -15,7 +16,7 @@ export function getAllFridaysBetween(startDate: string, endDate: string): string
   while (current <= end) {
     const dayOfWeek = current.getDay();
     if (dayOfWeek === 5) {
-      fridays.push(current.toISOString().split('T')[0]);
+      fridays.push(current.toISOString().split('T')[0]!);
     }
     current.setDate(current.getDate() + 1);
   }
@@ -23,14 +24,14 @@ export function getAllFridaysBetween(startDate: string, endDate: string): string
   return fridays;
 }
 
-export function generateDateColumns(lastEntryDate: string | null): string[] {
+export function generateDateColumns(firstEntryDate: string | null): string[] {
   const today = new Date();
   const targetDate = today.getDay() === 5 ? today : new Date(getLastFriday(today));
   
-  if (!lastEntryDate) {
-    return [targetDate.toISOString().split('T')[0]];
+  if (!firstEntryDate) {
+    return [targetDate.toISOString().split('T')[0]!];
   }
   
-  const allFridays = getAllFridaysBetween(lastEntryDate, targetDate.toISOString().split('T')[0]);
-  return allFridays.length > 0 ? allFridays : [targetDate.toISOString().split('T')[0]];
+  const allFridays = getAllFridaysBetween(firstEntryDate, targetDate.toISOString().split('T')[0]!);
+  return allFridays.length > 0 ? allFridays : [targetDate.toISOString().split('T')[0]!];
 }

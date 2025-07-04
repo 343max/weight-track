@@ -76,8 +76,8 @@ const server = Bun.serve({
       if (url.pathname === "/api/data" && method === "GET") {
         const users = db.getAllUsers();
         const weights = db.getAllWeights();
-        const lastEntryDate = db.getLastEntryDate();
-        const dateColumns = generateDateColumns(lastEntryDate);
+        const firstEntryDate = db.getFirstEntryDate();
+        const dateColumns = generateDateColumns(firstEntryDate);
         
         const weightsByUserAndDate = weights.reduce((acc, weight) => {
           const key = `${weight.user_id}-${weight.date}`;
