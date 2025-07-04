@@ -68,25 +68,29 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
   }
 
   return (
-    <div className="p-4 h-screen overflow-hidden">
+    <div className="p-6 h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
       <div className="h-full overflow-hidden">
+        <div className="mb-4">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Weight Tracker</h1>
+          <p className="text-gray-600 dark:text-gray-400">Track your weekly progress with friends</p>
+        </div>
         <div
           ref={tableRef}
-          className="overflow-x-auto h-full"
+          className="overflow-x-auto h-[calc(100%-120px)] rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
           style={{ scrollbarWidth: 'thin' }}
         >
-          <table className="border-collapse border border-gray-300 dark:border-gray-600">
+          <table className="border-collapse w-full">
             <thead>
-              <tr className="bg-gray-100 dark:bg-gray-800">
-                <th className="sticky-col border border-gray-300 dark:border-gray-600 p-2 text-left bg-gray-100 dark:bg-gray-800 min-w-[120px]">
-                  <span className="text-gray-900 dark:text-gray-100 font-medium">Name</span>
+              <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
+                <th className="sticky-col p-4 text-left font-semibold min-w-[140px] bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
+                  <span className="text-white">Name</span>
                 </th>
                 {dateColumns.map((date) => (
                   <th
                     key={date}
-                    className="weight-col border border-gray-300 dark:border-gray-600 p-2 text-center bg-gray-100 dark:bg-gray-800"
+                    className="weight-col p-4 text-center font-semibold min-w-[100px] border-r border-blue-500 last:border-r-0"
                   >
-                    <span className="text-gray-900 dark:text-gray-100 font-medium text-sm">
+                    <span className="text-white text-sm">
                       {formatDate(date)}
                     </span>
                   </th>
@@ -94,18 +98,27 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id} className="border-b border-gray-200 dark:border-gray-700">
+              {users.map((user, index) => (
+                <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <td
-                    className="sticky-col border border-gray-300 dark:border-gray-600 p-2 font-medium bg-white dark:bg-gray-900"
-                    style={{ backgroundColor: user.color + '20' }}
+                    className="sticky-col p-4 font-semibold border-r border-gray-200 dark:border-gray-600"
+                    style={{ 
+                      backgroundColor: user.color + '30',
+                      backdropFilter: 'blur(10px)'
+                    }}
                   >
-                    <span className="text-gray-900 dark:text-gray-100">{user.name}</span>
+                    <div className="flex items-center space-x-3">
+                      <div 
+                        className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
+                        style={{ backgroundColor: user.color }}
+                      ></div>
+                      <span className="text-gray-900 dark:text-gray-100 font-medium">{user.name}</span>
+                    </div>
                   </td>
                   {dateColumns.map((date) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className="weight-col border border-gray-300 dark:border-gray-600 p-1 text-center bg-white dark:bg-gray-900"
+                      className="weight-col border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
                     >
                       <WeightInput
                         userId={user.id}
