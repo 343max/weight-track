@@ -66,6 +66,34 @@ function App() {
     }
   }
 
+  const deleteWeight = async (userId: number, date: string) => {
+    try {
+      const secret = new URLSearchParams(window.location.search).get("secret")
+      if (!secret) {
+        throw new Error("Secret parameter is required")
+      }
+
+      const response = await fetch(`/api/weight?secret=${secret}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          date,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error("Failed to delete weight")
+      }
+
+      return await response.json()
+    } catch (err) {
+      throw err
+    }
+  }
+
   useEffect(() => {
     fetchData()
 
@@ -81,7 +109,7 @@ function App() {
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data)
-      if (message.type === "weight_updated") {
+      if (message.type === "weight_updated" || message.type === "weight_deleted") {
         fetchData()
       }
     }
@@ -132,6 +160,7 @@ function App() {
         weights={data.weights}
         dateColumns={data.dateColumns}
         onSaveWeight={saveWeight}
+        onDeleteWeight={deleteWeight}
       />
     </div>
   )

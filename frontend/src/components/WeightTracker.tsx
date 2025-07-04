@@ -7,9 +7,10 @@ interface WeightTrackerProps {
   weights: Record<string, WeightEntry>
   dateColumns: string[]
   onSaveWeight: (userId: number, date: string, weight: number) => Promise<WeightChangeInfo>
+  onDeleteWeight: (userId: number, date: string) => Promise<any>
 }
 
-function WeightTracker({ users, weights, dateColumns, onSaveWeight }: WeightTrackerProps) {
+function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeight }: WeightTrackerProps) {
   const tableRef = useRef<HTMLDivElement>(null)
   const [weightChanges, setWeightChanges] = useState<Record<string, WeightChangeInfo>>({})
 
@@ -28,6 +29,20 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight }: WeightTrac
         [key]: result
       }))
       return result
+    } catch (error) {
+      throw error
+    }
+  }
+
+  const handleDeleteWeight = async (userId: number, date: string) => {
+    try {
+      await onDeleteWeight(userId, date)
+      const key = `${userId}-${date}`
+      setWeightChanges(prev => {
+        const newChanges = { ...prev }
+        delete newChanges[key]
+        return newChanges
+      })
     } catch (error) {
       throw error
     }
@@ -98,6 +113,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight }: WeightTrac
                         initialWeight={getWeightForUserAndDate(user.id, date)}
                         weightChangeInfo={getWeightChangeInfo(user.id, date)}
                         onSave={handleSaveWeight}
+                        onDelete={handleDeleteWeight}
                       />
                     </td>
                   ))}

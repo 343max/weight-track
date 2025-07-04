@@ -110,6 +110,12 @@ export class WeightTracker {
     return result.first_date;
   }
 
+  deleteWeight(userId: number, date: string): boolean {
+    const stmt = this.db.prepare("DELETE FROM weights WHERE user_id = ? AND date = ?");
+    const result = stmt.run(userId, date);
+    return result.changes > 0;
+  }
+
   close() {
     this.db.close();
   }
