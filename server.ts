@@ -93,7 +93,8 @@ const server = Bun.serve({
       }
       
       if (url.pathname === "/api/weight" && method === "POST") {
-        const { userId, date, weight } = await request.json();
+        const body = await request.json();
+        const { userId, date, weight } = body as { userId: number; date: string; weight: number };
         
         if (!userId || !date || weight === undefined) {
           return new Response("Missing required fields", { status: 400 });
@@ -113,6 +114,28 @@ const server = Bun.serve({
         });
         
         return Response.json(responseData);
+      }
+      
+      if (url.pathname === "/api/weight" && method === "DELETE") {
+        const body = await request.json();
+        const { userId, date } = body as { userId: number; date: string };
+        
+        if (!userId || !date) {
+          return new Response("Missing required fields", { status: 400 });
+        }
+        
+        const deleted = db.deleteWeight(userId, date);
+        
+        if (deleted) {
+          broadcastUpdate({
+            type: "weight_deleted",
+            data: { userId, date },
+          });
+          
+          return Response.json({ success: true });
+        } else {
+          return new Response("Weight not found", { status: 404 });
+        }
       }
       
       return new Response("Not Found", { status: 404 });

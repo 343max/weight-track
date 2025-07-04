@@ -7,9 +7,10 @@ interface WeightInputProps {
   initialWeight: number | null
   weightChangeInfo: WeightChangeInfo | null
   onSave: (userId: number, date: string, weight: number) => Promise<WeightChangeInfo>
+  onDelete: (userId: number, date: string) => Promise<void>
 }
 
-function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave }: WeightInputProps) {
+function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, onDelete }: WeightInputProps) {
   const [value, setValue] = useState(initialWeight?.toString() || '')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -33,22 +34,28 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave }: 
   }, [weightChangeInfo])
 
   const handleSave = async (weightValue: string) => {
-    if (!weightValue || weightValue.trim() === '') {
-      return
-    }
-
-    const numericValue = parseFloat(weightValue)
-    if (isNaN(numericValue) || numericValue <= 0) {
-      return
-    }
-
     setIsSaving(true)
     try {
+      if (!weightValue || weightValue.trim() === '') {
+        // Delete the weight if field is empty and there was a previous value
+        if (initialWeight !== null) {
+          await onDelete(userId, date)
+          setDisplayInfo(null)
+          lastValidValueRef.current = ''
+        }
+        return
+      }
+
+      const numericValue = parseFloat(weightValue)
+      if (isNaN(numericValue) || numericValue <= 0) {
+        return
+      }
+
       const result = await onSave(userId, date, numericValue)
       setDisplayInfo(result)
       lastValidValueRef.current = numericValue.toString()
     } catch (error) {
-      console.error('Failed to save weight:', error)
+      console.error('Failed to save/delete weight:', error)
     } finally {
       setIsSaving(false)
     }
@@ -72,6 +79,12 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave }: 
     
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
+    }
+
+    // Allow empty value (for deletion)
+    if (!value || value.trim() === '') {
+      handleSave(value)
+      return
     }
 
     const numericValue = parseFloat(value)
