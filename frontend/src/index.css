@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --shake-distance: 10px;
+  }
+}
+
+@layer utilities {
+  .shake {
+    animation: shake 0.5s ease-in-out;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-var(--shake-distance)); }
+    75% { transform: translateX(var(--shake-distance)); }
+  }
+  
+  .sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 10;
+  }
+  
+  .weight-input {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+  }
+  
+  .weight-col {
+    width: 80px;
+    min-width: 80px;
+    max-width: 80px;
+  }
+  
+  .no-zoom {
+    touch-action: manipulation;
+  }
+}

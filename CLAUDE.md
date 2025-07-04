@@ -53,9 +53,26 @@ This is a simple weight tracking web application for a small group of trusted fr
 - `APP_SECRET`: Required secret token for access control
 - `DATABASE_PATH`: SQLite database file path (e.g., `./data/tracker.db`)
 
+## Development Commands
+
+- `bun run dev` - Start both server and frontend in development mode
+- `bun run dev:server` - Start server only with hot reload
+- `bun run dev:frontend` - Start frontend only (Vite dev server)
+- `bun run build` - Build frontend for production
+- `bun run start` - Start production server
+- `bun setup-sample-data.ts` - Create sample data for testing
+
+## Environment Variables
+
+- `APP_SECRET` - Required secret token for access control
+- `DATABASE_PATH` - SQLite database file path (default: `./data/tracker.db`)
+- `PORT` - Server port (default: 3000)
+
 ## Development Notes
 
-- No existing build/test commands found - project appears to be in requirements phase
+- Uses Bun's built-in SQLite database (no external dependencies)
+- WebSocket server runs on port 8080 for real-time updates
+- Frontend builds to `./dist` directory
 - Manual user management via direct database access (no UI)
 - Prioritizes simplicity over security - designed for trusted users only
-- use shell tool to manage depndencies. e.g. use `bun init` to initialize a new project instead of creating files. use `bun add` instead of writing directly to package.json
+- Access via `http://localhost:3000/?secret=your_secret_here`
