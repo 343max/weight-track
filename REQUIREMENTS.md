@@ -31,7 +31,6 @@ A small, private group of friends who trust each other with full access to the a
 - A table-based UI displaying users and their weight entries.
 - Manual data entry and editing of weight values.
 - Automatic saving of data on input blur or after a short typing delay.
-- Real-time data synchronization using WebSockets.
 - Visual indicators for weekly weight gain, loss, or no change.
 - Backend data storage using an SQLite database and powered by the Bun runtime.
 
@@ -58,6 +57,8 @@ A small, private group of friends who trust each other with full access to the a
 #### **3.2 User Interface (UI) and Interaction**
 
 - **Layout:** The primary UI will be a single data table rendered as a React component.
+- Pinch to zoom should be disabled
+- all weight columns should have a fixed width of 80px
 - **Responsiveness:** The layout must be responsive for both mobile and desktop screens.
 - **Dark/Light Mode:** The application will automatically adapt to the user's operating system's dark or light mode preference using CSS media queries (`prefers-color-scheme`). No manual toggle switch will be provided.
 - **Table Structure:**
@@ -79,11 +80,6 @@ A small, private group of friends who trust each other with full access to the a
 - **Auto-Save:** Data must be saved to the server automatically. This is triggered by whichever of the following events occurs first:
   1.  When an input field loses focus (**On Blur**).
   2.  2 seconds after the user has stopped typing in an input field.
-
-#### **3.4 Real-Time Updates**
-
-- **Architecture:** The client-server communication must be built on **WebSockets**.
-- **Live Sync:** When one user updates a weight value, the change must be broadcast to all other connected clients in real-time. The corresponding cell in their tables should update instantly without requiring a page refresh.
 
 #### **3.5 Weekly Change Indicator**
 
@@ -114,7 +110,6 @@ The application shall dynamically generate the date columns based on the followi
 
 - **Performance:** The UI should be fast and responsive, with real-time updates appearing with minimal latency.
 - **Usability:** The interface must be extremely simple and self-explanatory.
-- **Reliability:** The WebSocket connection should be stable and attempt to reconnect automatically if dropped.
 
 ---
 
@@ -123,7 +118,7 @@ The application shall dynamically generate the date columns based on the followi
 #### **5.1 Architecture**
 
 - **Backend:** A JavaScript/TypeScript application running on the **Bun** runtime. It will be responsible for:
-  - Hosting the API endpoints and managing the WebSocket server.
+  - Hosting the API endpoints.
   - Validating the access secret.
   - Serving the static frontend application files.
 - **Frontend:** A Single-Page Application (SPA) developed using the **React** library.
