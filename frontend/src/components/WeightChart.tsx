@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import type { User, WeightEntry } from "../types"
 
 interface WeightChartProps {
@@ -9,10 +9,19 @@ interface WeightChartProps {
 
 export default function WeightChart({ users, weights, dateColumns }: WeightChartProps) {
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set(users.map(u => u.id)))
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const hasScrolledRef = useRef(false)
   
   useEffect(() => {
     setSelectedUsers(new Set(users.map(u => u.id)))
   }, [users])
+
+  useEffect(() => {
+    if (scrollContainerRef.current && !hasScrolledRef.current && dateColumns.length > 0) {
+      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth
+      hasScrolledRef.current = true
+    }
+  }, [dateColumns])
 
   const toggleUser = (userId: number) => {
     const newSelected = new Set(selectedUsers)
@@ -51,7 +60,8 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
   }
 
   // Calculate chart dimensions and scales
-  const chartWidth = 800
+  const pointWidth = 60 // Width per date point
+  const chartWidth = Math.max(600, dateColumns.length * pointWidth)
   const chartHeight = 400
   const margin = { top: 20, right: 80, bottom: 40, left: 60 }
   const innerWidth = chartWidth - margin.left - margin.right
@@ -92,7 +102,8 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
 
       {/* Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-        <svg width={chartWidth} height={chartHeight} className="overflow-visible">
+        <div ref={scrollContainerRef} className="overflow-x-auto">
+          <svg width={chartWidth} height={chartHeight} className="overflow-visible">
           {/* Grid lines */}
           <g transform={`translate(${margin.left}, ${margin.top})`}>
             {/* Horizontal grid lines */}
@@ -203,6 +214,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
               })}
           </g>
         </svg>
+        </div>
       </div>
     </div>
   )

@@ -14,6 +14,7 @@ function App() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken">("zahlen")
+  const [chartKey, setChartKey] = useState(0)
   const wsRef = useRef<WebSocket | null>(null)
 
   const fetchData = async () => {
@@ -171,7 +172,10 @@ function App() {
             Zahlen
           </button>
           <button
-            onClick={() => setActiveTab("grafiken")}
+            onClick={() => {
+              setActiveTab("grafiken")
+              setChartKey(prev => prev + 1)
+            }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === "grafiken"
                 ? "border-blue-500 text-blue-600 dark:text-blue-400"
@@ -195,6 +199,7 @@ function App() {
           />
         ) : (
           <WeightChart
+            key={chartKey}
             users={data.users}
             weights={data.weights}
             dateColumns={data.dateColumns}
