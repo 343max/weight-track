@@ -172,12 +172,12 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
           className={`
-            weight-input text-center text-sm p-2 border-2 rounded-lg w-20
+            w-20 min-w-[80px] max-w-[80px] text-center text-sm p-2 border-2 rounded-lg
             bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600
             text-gray-900 dark:text-gray-100
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             shadow-sm
-            ${showShake ? "shake" : ""}
+            ${showShake ? "animate-shake" : ""}
             ${isSaving ? "opacity-50" : ""}
           `}
           placeholder="--"
