@@ -1,0 +1,21 @@
+services:
+  weight-tracker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: weight-tracker
+    ports:
+      - "3000:3000"
+    environment:
+      - APP_SECRET=${APP_SECRET:-change-me}
+      - DATABASE_PATH=/data/tracker.db
+      - PORT=3001
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/data?secret=${APP_SECRET:-change-me}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
