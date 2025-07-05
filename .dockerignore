@@ -1,0 +1,47 @@
+# Ignore node_modules
+node_modules/
+
+# Ignore git files
+.git/
+.gitignore
+
+# Ignore development files
+*.log
+*.tmp
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Ignore build artifacts (will be built in container)
+dist/
+frontend/dist/
+
+# Ignore TypeScript build info
+*.tsbuildinfo
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore test coverage
+coverage/
+
+# Ignore documentation
+README.md
+REQUIREMENTS.md
+
+# Ignore data directory (will be created in container)
+data/
+
+# Keep Dockerfile and related files
+!Dockerfile
+!Caddyfile
+!.dockerignore
