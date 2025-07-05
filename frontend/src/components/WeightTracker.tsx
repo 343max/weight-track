@@ -87,16 +87,28 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
     const date = new Date(dateString)
     const currentYear = new Date().getFullYear()
     const dateYear = date.getFullYear()
+    const dayOfWeek = date.getDay()
     
     const day = date.getDate().toString().padStart(2, '0')
     const month = (date.getMonth() + 1).toString().padStart(2, '0')
     
+    // German weekday abbreviations
+    const germanWeekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+    
+    let formattedDate = ''
     if (dateYear === currentYear) {
-      return `${day}.${month}`
+      formattedDate = `${day}.${month}`
     } else {
       const year = dateYear.toString().slice(-2)
-      return `${day}.${month}.${year}`
+      formattedDate = `${day}.${month}.${year}`
     }
+    
+    // If it's not Friday (day 5), prepend the German weekday
+    if (dayOfWeek !== 5) {
+      formattedDate = `${germanWeekdays[dayOfWeek]} ${formattedDate}`
+    }
+    
+    return formattedDate
   }
 
   return (

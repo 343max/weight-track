@@ -58,8 +58,8 @@ const server = Bun.serve({
       if (url.pathname === "/api/data" && method === "GET") {
         const users = db.getAllUsers()
         const weights = db.getAllWeights()
-        const firstEntryDate = db.getFirstEntryDate()
-        const dateColumns = generateDateColumns(firstEntryDate)
+        const existingDates = db.getAllDates()
+        const dateColumns = generateDateColumns(existingDates)
 
         const weightsByUserAndDate = weights.reduce((acc, weight) => {
           const key = `${weight.user_id}-${weight.date}`
@@ -113,8 +113,8 @@ const server = Bun.serve({
       if (url.pathname === "/api/export/sqlite" && method === "GET") {
         try {
           const file = Bun.file(DATABASE_PATH)
-          const fileName = `weight-tracker-${new Date().toISOString().split('T')[0]}.db`
-          
+          const fileName = `weight-tracker-${new Date().toISOString().split("T")[0]}.db`
+
           return new Response(file, {
             headers: {
               "Content-Type": "application/octet-stream",
