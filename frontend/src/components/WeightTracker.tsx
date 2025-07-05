@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from 'react'
-import type { User, WeightEntry, WeightChangeInfo } from '../types'
-import WeightInput from './WeightInput'
+import { useState, useEffect, useRef } from "react"
+import type { User, WeightEntry, WeightChangeInfo } from "../types"
+import WeightInput from "./WeightInput"
 
 interface WeightTrackerProps {
   users: User[]
@@ -26,9 +26,9 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
     try {
       const result = await onSaveWeight(userId, date, weight)
       const key = `${userId}-${date}`
-      setWeightChanges(prev => ({
+      setWeightChanges((prev) => ({
         ...prev,
-        [key]: result
+        [key]: result,
       }))
       return result
     } catch (error) {
@@ -40,7 +40,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
     try {
       await onDeleteWeight(userId, date)
       const key = `${userId}-${date}`
-      setWeightChanges(prev => {
+      setWeightChanges((prev) => {
         const newChanges = { ...prev }
         delete newChanges[key]
         return newChanges
@@ -58,85 +58,72 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
 
   const getWeightChangeInfo = (userId: number, date: string): WeightChangeInfo | null => {
     const key = `${userId}-${date}`
-    
+
     // First check if we have it in our local state (from recent saves)
     if (weightChanges[key]) {
       return weightChanges[key]
     }
-    
+
     // Otherwise, calculate it from the existing data
     const currentWeight = weights[key]
     if (!currentWeight) {
       return null
     }
-    
+
     // Find the previous weight for this user
     const userWeights = Object.values(weights)
-      .filter(w => w.user_id === userId && w.date < date)
+      .filter((w) => w.user_id === userId && w.date < date)
       .sort((a, b) => b.date.localeCompare(a.date))
-    
+
     const previousWeight = userWeights[0] || null
-    
+
     return {
       weight: currentWeight,
-      previousWeight: previousWeight
+      previousWeight: previousWeight,
     }
   }
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
+    return date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
     })
   }
 
   return (
-    <div className="p-6 h-screen overflow-hidden bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="h-full overflow-hidden">
+    <div>
+      <div>
         <div className="mb-4">
           <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Weight Tracker</h1>
-          <p className="text-gray-600 dark:text-gray-400">Track your weekly progress with friends</p>
         </div>
-        <div
-          ref={tableRef}
-          className="overflow-x-auto h-[calc(100%-120px)] rounded-xl shadow-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700"
-          style={{ scrollbarWidth: 'thin' }}
-        >
-          <table className="border-collapse w-full">
+        <div ref={tableRef} className="overflow-x-auto bg-white dark:bg-gray-800">
+          <table className="table-auto relative">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                <th className="sticky left-0 z-10 p-4 text-left font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
-                </th>
+              <tr>
+                <th className="sticky left-0 z-10"></th>
                 {dateColumns.map((date) => (
                   <th
                     key={date}
                     className="w-[100px] min-w-[100px] max-w-[100px] p-4 text-center font-semibold border-r border-blue-500 last:border-r-0"
                   >
-                    <span className="text-white text-sm">
-                      {formatDate(date)}
-                    </span>
+                    <span className="text-white text-sm">{formatDate(date)}</span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {users.map((user, index) => (
-                <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-                  <td
-                    className="sticky left-0 z-10 p-4 font-semibold border-r border-gray-200 dark:border-gray-600 bg-white dark:bg-black whitespace-nowrap"
-                  >
-                    <span 
-                      className="font-bold"
-                      style={{ color: user.color }}
-                    >
+              {users.map((user) => (
+                <tr key={user.id}>
+                  <td className="sticky left-0 z-10">
+                    <span className="font-bold" style={{ color: user.color }}>
                       {user.name}
                     </span>
                   </td>
                   {dateColumns.map((date) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className="w-[100px] min-w-[100px] max-w-[100px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
+                      className="first:sticky w-[100px] min-w-[100px] max-w-[100px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
                     >
                       <WeightInput
                         userId={user.id}
@@ -152,7 +139,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
               ))}
             </tbody>
           </table>
-        </div>
+        </div>{" "}
       </div>
     </div>
   )
