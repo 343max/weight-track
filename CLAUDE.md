@@ -4,13 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a simple weight tracking web application for a small group of trusted friends. It's designed to be minimal, real-time, and collaborative with no user authentication - access is controlled by a shared secret URL parameter.
+This is a simple weight tracking web application for a small group of trusted friends. It's designed to be minimal and collaborative with no user authentication - access is controlled by a shared secret URL parameter.
 
 ## Technical Stack
 
 - **Backend**: Bun runtime with JavaScript/TypeScript, SQLite database
 - **Frontend**: React SPA built with Vite, styled with Tailwind CSS
-- **Real-time**: WebSocket-based communication for live updates
 - **Database**: SQLite with two tables: `Users` and `Weights`
 - **Language**: TypeScript
 - **Data**: Use Zod to validate external json
@@ -37,9 +36,8 @@ This is a simple weight tracking web application for a small group of trusted fr
 - Auto-scrolls to rightmost (most recent) date on load
 - Responsive design with dark/light mode via `prefers-color-scheme`
 
-### Real-time Features
+### Interactive Features
 
-- WebSocket connection for live data synchronization
 - Auto-save on blur or 2-second typing delay
 - Weekly change indicators (green ↓, red ↑, or –)
 - Input validation with shake animation on invalid data
@@ -73,7 +71,6 @@ This is a simple weight tracking web application for a small group of trusted fr
 ## Development Notes
 
 - Uses Bun's built-in SQLite database (no external dependencies)
-- WebSocket server runs on port 8080 for real-time updates
 - Frontend builds to `./dist` directory
 - Manual user management via direct database access (no UI)
 - Prioritizes simplicity over security - designed for trusted users only

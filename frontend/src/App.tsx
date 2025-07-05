@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import WeightTracker from "./components/WeightTracker"
 import WeightChart from "./components/WeightChart"
 import Export from "./components/Export"
@@ -16,7 +16,6 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken" | "export">("zahlen")
   const [chartKey, setChartKey] = useState(0)
-  const wsRef = useRef<WebSocket | null>(null)
 
   const fetchData = async () => {
     try {
@@ -64,6 +63,10 @@ function App() {
       }
 
       const result = await response.json()
+      
+      // Refresh data to show updated value immediately
+      await fetchData()
+      
       return result
     } catch (err) {
       throw err
@@ -92,6 +95,9 @@ function App() {
         throw new Error("Failed to delete weight")
       }
 
+      // Refresh data to show updated value immediately
+      await fetchData()
+
       return await response.json()
     } catch (err) {
       throw err
@@ -100,37 +106,6 @@ function App() {
 
   useEffect(() => {
     fetchData()
-
-    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-    const wsUrl = `${protocol}//${window.location.hostname}:8080`
-
-    const ws = new WebSocket(wsUrl)
-    wsRef.current = ws
-
-    ws.onopen = () => {
-      console.log("WebSocket connected")
-    }
-
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data)
-      if (message.type === "weight_updated" || message.type === "weight_deleted") {
-        fetchData()
-      }
-    }
-
-    ws.onclose = () => {
-      console.log("WebSocket disconnected")
-    }
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error:", error)
-    }
-
-    return () => {
-      if (wsRef.current) {
-        wsRef.current.close()
-      }
-    }
   }, [])
 
   if (loading) {

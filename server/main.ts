@@ -1,6 +1,5 @@
 import { WeightTracker } from "./database"
 import { generateDateColumns } from "./utils"
-import { WebSocketServer } from "ws"
 import { mkdir } from "fs/promises"
 import { dirname } from "path"
 import { existsSync } from "fs"
@@ -17,23 +16,6 @@ if (APP_SECRET === undefined) {
 await mkdir(dirname(DATABASE_PATH), { recursive: true })
 
 const db = new WeightTracker(DATABASE_PATH)
-const wss = new WebSocketServer({ port: 8080 })
-
-wss.on("connection", (ws) => {
-  console.log("WebSocket client connected")
-
-  ws.on("close", () => {
-    console.log("WebSocket client disconnected")
-  })
-})
-
-function broadcastUpdate(data: any) {
-  wss.clients.forEach((client) => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify(data))
-    }
-  })
-}
 
 function validateSecret(request: Request): boolean {
   const url = new URL(request.url)
@@ -108,11 +90,6 @@ const server = Bun.serve({
           previousWeight,
         }
 
-        broadcastUpdate({
-          type: "weight_updated",
-          data: responseData,
-        })
-
         return Response.json(responseData)
       }
 
@@ -127,11 +104,6 @@ const server = Bun.serve({
         const deleted = db.deleteWeight(userId, date)
 
         if (deleted) {
-          broadcastUpdate({
-            type: "weight_deleted",
-            data: { userId, date },
-          })
-
           return Response.json({ success: true })
         } else {
           return new Response("Weight not found", { status: 404 })
@@ -189,4 +161,3 @@ const server = Bun.serve({
 })
 
 console.log(`Server running on http://localhost:${PORT}`)
-console.log(`WebSocket server running on ws://localhost:8080`)

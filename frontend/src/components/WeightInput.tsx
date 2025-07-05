@@ -15,7 +15,6 @@ export function WeightInput({ userId, date, initialWeight, weightChangeInfo, onS
   const [value, setValue] = useState(initialWeight?.toString() || "")
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [showShake, setShowShake] = useState(false)
   const [displayInfo, setDisplayInfo] = useState<WeightChangeInfo | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -100,9 +99,7 @@ export function WeightInput({ userId, date, initialWeight, weightChangeInfo, onS
 
     // Dismiss invalid inputs
     if (!isValidWeight(value)) {
-      setShowShake(true)
       setValue(lastValidValueRef.current)
-      setTimeout(() => setShowShake(false), 500)
       return
     }
 
