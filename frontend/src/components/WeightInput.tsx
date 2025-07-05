@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import type { WeightChangeInfo } from "../types"
+import { parseWeightInput, isZeroWeight, isValidWeight } from "../utils/weightParser"
 
 interface WeightInputProps {
   userId: number
@@ -20,10 +21,6 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastValidValueRef = useRef<string>("")
 
-  // Helper function to normalize decimal separator
-  const normalizeDecimal = (input: string): string => {
-    return input.replace(",", ".")
-  }
 
   useEffect(() => {
     if (initialWeight !== null) {
@@ -51,9 +48,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
         return
       }
 
-      const normalizedValue = normalizeDecimal(weightValue)
-      const numericValue = parseFloat(normalizedValue)
-      if (isNaN(numericValue) || numericValue <= 0) {
+      const numericValue = parseWeightInput(weightValue)
+      if (numericValue === null || numericValue <= 0) {
         return
       }
 
@@ -93,11 +89,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
       return
     }
 
-    const normalizedValue = normalizeDecimal(value)
-    const numericValue = parseFloat(normalizedValue)
-
     // Handle explicit "0" as deletion request
-    if (normalizedValue.trim() === "0") {
+    if (isZeroWeight(value)) {
       if (initialWeight !== null) {
         handleSave("") // Trigger deletion
       } else {
@@ -107,7 +100,7 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     }
 
     // Dismiss invalid inputs
-    if (isNaN(numericValue) || numericValue <= 0) {
+    if (!isValidWeight(value)) {
       setShowShake(true)
       setValue(lastValidValueRef.current)
       setTimeout(() => setShowShake(false), 500)
