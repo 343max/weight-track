@@ -101,11 +101,11 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
           <table className="table-auto relative">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10"></th>
+                <th className="sticky left-0 z-10 bg-white dark:bg-gray-800"></th>
                 {dateColumns.map((date) => (
                   <th
                     key={date}
-                    className="w-[100px] min-w-[100px] max-w-[100px] p-4 text-center font-semibold border-r border-blue-500 last:border-r-0"
+                    className="w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold border-r border-blue-500 last:border-r-0"
                   >
                     <span className="text-white text-sm">{formatDate(date)}</span>
                   </th>
@@ -115,7 +115,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
             <tbody>
               {users.map((user) => (
                 <tr key={user.id}>
-                  <td className="sticky left-0 z-10">
+                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800">
                     <span className="font-bold" style={{ color: user.color }}>
                       {user.name}
                     </span>
@@ -123,7 +123,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
                   {dateColumns.map((date) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className="first:sticky w-[100px] min-w-[100px] max-w-[100px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
+                      className="first:sticky w-[80px] min-w-[80px] max-w-[80px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
                     >
                       <WeightInput
                         userId={user.id}
