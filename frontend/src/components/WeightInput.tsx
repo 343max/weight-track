@@ -106,12 +106,20 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   }
 
   const renderWeightChange = () => {
-    if (!displayInfo || !displayInfo.previousWeight) {
+    // Don't show during editing
+    if (isEditing) {
       return null
     }
 
-    const current = displayInfo.weight.weight_kg
-    const previous = displayInfo.previousWeight.weight_kg
+    // Use weightChangeInfo prop if available, otherwise use displayInfo
+    const changeInfo = weightChangeInfo || displayInfo
+    
+    if (!changeInfo || !changeInfo.previousWeight || !changeInfo.weight) {
+      return null
+    }
+
+    const current = changeInfo.weight.weight_kg
+    const previous = changeInfo.previousWeight.weight_kg
     const change = current - previous
 
     if (change === 0) {

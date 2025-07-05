@@ -56,7 +56,29 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
 
   const getWeightChangeInfo = (userId: number, date: string): WeightChangeInfo | null => {
     const key = `${userId}-${date}`
-    return weightChanges[key] || null
+    
+    // First check if we have it in our local state (from recent saves)
+    if (weightChanges[key]) {
+      return weightChanges[key]
+    }
+    
+    // Otherwise, calculate it from the existing data
+    const currentWeight = weights[key]
+    if (!currentWeight) {
+      return null
+    }
+    
+    // Find the previous weight for this user
+    const userWeights = Object.values(weights)
+      .filter(w => w.user_id === userId && w.date < date)
+      .sort((a, b) => b.date.localeCompare(a.date))
+    
+    const previousWeight = userWeights[0] || null
+    
+    return {
+      weight: currentWeight,
+      previousWeight: previousWeight
+    }
   }
 
   const formatDate = (dateString: string): string => {
