@@ -85,10 +85,18 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
-    return date.toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-    })
+    const currentYear = new Date().getFullYear()
+    const dateYear = date.getFullYear()
+    
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
+    
+    if (dateYear === currentYear) {
+      return `${day}.${month}`
+    } else {
+      const year = dateYear.toString().slice(-2)
+      return `${day}.${month}.${year}`
+    }
   }
 
   return (
@@ -102,12 +110,16 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
             <thead>
               <tr>
                 <th className="sticky left-0 z-10 bg-white dark:bg-gray-800"></th>
-                {dateColumns.map((date) => (
+                {dateColumns.map((date, index) => (
                   <th
                     key={date}
-                    className="w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold border-r border-blue-500 last:border-r-0"
+                    className={`w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
+                      index % 2 === 0 
+                        ? 'bg-blue-50 dark:bg-blue-900/20' 
+                        : 'bg-blue-100 dark:bg-blue-800/20'
+                    }`}
                   >
-                    <span className="text-white text-sm">{formatDate(date)}</span>
+                    <span className="text-gray-800 dark:text-white text-sm">{formatDate(date)}</span>
                   </th>
                 ))}
               </tr>
@@ -120,10 +132,14 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
                       {user.name}
                     </span>
                   </td>
-                  {dateColumns.map((date) => (
+                  {dateColumns.map((date, index) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className="first:sticky w-[80px] min-w-[80px] max-w-[80px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
+                      className={`first:sticky w-[80px] min-w-[80px] max-w-[80px] ${
+                        index % 2 === 0 
+                          ? 'bg-blue-50 dark:bg-blue-900/20' 
+                          : 'bg-blue-100 dark:bg-blue-800/20'
+                      }`}
                     >
                       <WeightInput
                         userId={user.id}
