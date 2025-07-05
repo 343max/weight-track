@@ -11,7 +11,7 @@ interface WeightInputProps {
   onDelete: (userId: number, date: string) => Promise<void>
 }
 
-function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, onDelete }: WeightInputProps) {
+export function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, onDelete }: WeightInputProps) {
   const [value, setValue] = useState(initialWeight?.toString() || "")
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
@@ -20,7 +20,6 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   const inputRef = useRef<HTMLInputElement>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastValidValueRef = useRef<string>("")
-
 
   useEffect(() => {
     if (initialWeight !== null) {
@@ -163,48 +162,30 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
 
   if (isEditing) {
     return (
-      <div className="flex flex-col items-center justify-center p-2">
-        <input
-          ref={inputRef}
-          type="text"
-          inputMode="decimal"
-          value={value}
-          onChange={handleInputChange}
-          onBlur={handleBlur}
-          onKeyDown={handleKeyDown}
-          className={`
-            w-20 min-w-[80px] max-w-[80px] text-center text-sm p-2 border-2 rounded-lg
-            bg-white dark:bg-gray-800 border-blue-300 dark:border-blue-600
-            text-gray-900 dark:text-gray-100
-            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-            shadow-sm
-            ${showShake ? "animate-shake" : ""}
-            ${isSaving ? "opacity-50" : ""}
-          `}
-          placeholder="--"
-          step="0.1"
-          min="0"
-          disabled={isSaving}
-          autoFocus
-        />
-      </div>
+      <input
+        ref={inputRef}
+        type="text"
+        inputMode="decimal"
+        value={value}
+        onChange={handleInputChange}
+        onBlur={handleBlur}
+        onKeyDown={handleKeyDown}
+        className="text-center w-full dark:text-white"
+        placeholder="--"
+        step="0.1"
+        min="0"
+        disabled={isSaving}
+        autoFocus
+      />
     )
   }
 
   return (
-    <div
-      className="flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors min-h-[60px]"
-      onClick={handleClick}
-    >
-      <div className="text-center">
-        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {initialWeight !== null ? initialWeight.toFixed(1) : "--"}
-        </div>
-        {renderWeightChange()}
+    <div className="text-center p-2" onClick={handleClick}>
+      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        {initialWeight !== null ? initialWeight.toFixed(1) : "--"}
       </div>
-      {isSaving && <div className="text-xs text-blue-500 dark:text-blue-400 mt-1">Saving...</div>}
+      {renderWeightChange()}
     </div>
   )
 }
-
-export default WeightInput

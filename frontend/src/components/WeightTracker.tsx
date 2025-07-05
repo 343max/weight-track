@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react"
 import type { User, WeightEntry, WeightChangeInfo } from "../types"
-import WeightInput from "./WeightInput"
+import { WeightInput } from "./WeightInput"
 
 interface WeightTrackerProps {
   users: User[]
