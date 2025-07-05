@@ -1,11 +1,6 @@
-version: '3.8'
-
 services:
   weight-tracker:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: weight-tracker-prod
+    image: ghcr.io/343max/weight-track:main-f9ca651
     ports:
       - "80:3000"
     environment:
@@ -13,9 +8,7 @@ services:
       - DATABASE_PATH=/data/tracker.db
       - PORT=3001
     volumes:
-      # Use named volumes for production
-      - weight-tracker-data:/data
-      - weight-tracker-logs:/var/log/caddy
+      - ./data:/data
     restart: always
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3000/api/data?secret=${APP_SECRET}"]
@@ -23,32 +16,4 @@ services:
       timeout: 10s
       retries: 5
       start_period: 60s
-    networks:
-      - weight-tracker-network
-    # Security: Run as non-root user
     user: "1000:1000"
-    # Resource limits
-    deploy:
-      resources:
-        limits:
-          cpus: '1.0'
-          memory: 512M
-        reservations:
-          cpus: '0.25'
-          memory: 128M
-    # Logging configuration
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-networks:
-  weight-tracker-network:
-    driver: bridge
-
-volumes:
-  weight-tracker-data:
-    driver: local
-  weight-tracker-logs:
-    driver: local
