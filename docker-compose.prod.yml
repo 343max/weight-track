@@ -1,6 +1,6 @@
 services:
   weight-tracker:
-    image: ghcr.io/343max/weight-track:main-f9ca651
+    image: ghcr.io/343max/weight-track
     ports:
       - "80:3000"
     environment:
