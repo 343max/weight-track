@@ -23,36 +23,9 @@
 
 	# Security headers
 	header {
-		# Remove server info
 		-Server
-		# Security headers
 		X-Content-Type-Options "nosniff"
 		X-Frame-Options "DENY"
 		X-XSS-Protection "1; mode=block"
-		Referrer-Policy "strict-origin-when-cross-origin"
-		# Cache control for static assets
-		Cache-Control "public, max-age=31536000" {
-			path *.js
-			path *.css
-			path *.png
-			path *.jpg
-			path *.jpeg
-			path *.gif
-			path *.ico
-			path *.svg
-			path *.woff
-			path *.woff2
-		}
-		# No cache for HTML files
-		Cache-Control "no-cache, no-store, must-revalidate" {
-			path *.html
-			path /
-		}
-	}
-
-	# Logging for debugging (can be removed in production)
-	log {
-		output file /var/log/caddy/access.log
-		format json
 	}
 }
