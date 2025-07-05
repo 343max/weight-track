@@ -109,6 +109,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
               ]}
               yAxis={[{ position: "right", width: 30 }]}
               slotProps={{
+                /* @ts-expect-error */
                 legend: { hidden: true },
               }}
             />
