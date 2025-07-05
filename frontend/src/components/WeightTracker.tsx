@@ -13,10 +13,12 @@ interface WeightTrackerProps {
 function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeight }: WeightTrackerProps) {
   const tableRef = useRef<HTMLDivElement>(null)
   const [weightChanges, setWeightChanges] = useState<Record<string, WeightChangeInfo>>({})
+  const hasScrolledRef = useRef(false)
 
   useEffect(() => {
-    if (tableRef.current) {
+    if (tableRef.current && !hasScrolledRef.current) {
       tableRef.current.scrollLeft = tableRef.current.scrollWidth
+      hasScrolledRef.current = true
     }
   }, [dateColumns])
 
