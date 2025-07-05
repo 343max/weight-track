@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect } from "react"
 import { LineChart } from "@mui/x-charts/LineChart"
 import type { User, WeightEntry } from "../types"
 
@@ -10,19 +10,10 @@ interface WeightChartProps {
 
 export default function WeightChart({ users, weights, dateColumns }: WeightChartProps) {
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set(users.map((u) => u.id)))
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
-  const hasScrolledRef = useRef(false)
 
   useEffect(() => {
     setSelectedUsers(new Set(users.map((u) => u.id)))
   }, [users])
-
-  useEffect(() => {
-    if (scrollContainerRef.current && !hasScrolledRef.current && dateColumns.length > 0) {
-      scrollContainerRef.current.scrollLeft = scrollContainerRef.current.scrollWidth
-      hasScrolledRef.current = true
-    }
-  }, [dateColumns])
 
   const toggleUser = (userId: number) => {
     const newSelected = new Set(selectedUsers)
@@ -79,9 +70,6 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
 
   const { series, xLabels } = chartData()
 
-  // Calculate chart width based on number of data points
-  const pointWidth = 60
-  const chartWidth = Math.max(600, dateColumns.length * pointWidth)
   const chartHeight = 400
 
   return (
@@ -110,42 +98,27 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
 
       {/* Chart */}
       <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
-        <div ref={scrollContainerRef} className="overflow-x-auto">
-          <div style={{ width: chartWidth, height: chartHeight }}>
-            {series.length > 0 ? (
-              <LineChart
-                width={chartWidth}
-                height={chartHeight}
-                series={series}
-                xAxis={[
-                  {
-                    scaleType: "point",
-                    data: xLabels,
-                  },
-                ]}
-                margin={{ left: 60, right: 30, top: 30, bottom: 60 }}
-                grid={{ vertical: true, horizontal: true }}
-                sx={{
-                  "& .MuiChartsAxis-tickLabel": {
-                    fontSize: "12px",
-                    fill: "currentColor",
-                  },
-                  "& .MuiChartsAxis-label": {
-                    fontSize: "14px",
-                    fill: "currentColor",
-                  },
-                  "& .MuiChartsGrid-line": {
-                    stroke: "#e5e7eb",
-                    strokeDasharray: "2,2",
-                  },
-                }}
-              />
-            ) : (
-              <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
-                Keine Daten verfügbar
-              </div>
-            )}
-          </div>
+        <div style={{ width: "100%", height: chartHeight }}>
+          {series.length > 0 ? (
+            <LineChart
+              height={chartHeight}
+              series={series}
+              xAxis={[
+                {
+                  scaleType: "point",
+                  data: xLabels,
+                },
+              ]}
+              yAxis={[{ position: "right", width: 30 }]}
+              slotProps={{
+                legend: { hidden: true },
+              }}
+            />
+          ) : (
+            <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
+              Keine Daten verfügbar
+            </div>
+          )}
         </div>
       </div>
     </div>
