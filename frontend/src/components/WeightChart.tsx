@@ -75,8 +75,6 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
   return (
     <div className="p-4">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Gewichtsverlauf</h2>
-
         {/* User toggle buttons */}
         <div className="flex flex-wrap gap-2 mb-4">
           {users.map((user) => (
