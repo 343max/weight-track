@@ -106,12 +106,12 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
           <table className="border-collapse w-full">
             <thead>
               <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                <th className="sticky-col p-4 text-left font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
+                <th className="sticky left-0 z-10 p-4 text-left font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
                 </th>
                 {dateColumns.map((date) => (
                   <th
                     key={date}
-                    className="weight-col p-4 text-center font-semibold min-w-[100px] border-r border-blue-500 last:border-r-0"
+                    className="w-[100px] min-w-[100px] max-w-[100px] p-4 text-center font-semibold border-r border-blue-500 last:border-r-0"
                   >
                     <span className="text-white text-sm">
                       {formatDate(date)}
@@ -124,7 +124,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
               {users.map((user, index) => (
                 <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <td
-                    className="sticky-col p-4 font-semibold border-r border-gray-200 dark:border-gray-600 bg-white dark:bg-black whitespace-nowrap"
+                    className="sticky left-0 z-10 p-4 font-semibold border-r border-gray-200 dark:border-gray-600 bg-white dark:bg-black whitespace-nowrap"
                   >
                     <span 
                       className="font-bold"
@@ -136,7 +136,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
                   {dateColumns.map((date) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className="weight-col border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
+                      className="w-[100px] min-w-[100px] max-w-[100px] border-r border-gray-200 dark:border-gray-600 last:border-r-0 bg-white dark:bg-gray-800"
                     >
                       <WeightInput
                         userId={user.id}

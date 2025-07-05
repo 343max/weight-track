@@ -154,7 +154,7 @@ function App() {
   }
 
   return (
-    <div className="no-zoom bg-white dark:bg-gray-900 min-h-screen">
+    <div className="bg-white dark:bg-gray-900 min-h-screen">
       <WeightTracker
         users={data.users}
         weights={data.weights}
