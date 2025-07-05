@@ -88,13 +88,13 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     }
 
     const numericValue = parseFloat(value)
-    
+
     // Handle explicit "0" as deletion request
     if (value.trim() === "0") {
       if (initialWeight !== null) {
-        handleSave("")  // Trigger deletion
+        handleSave("") // Trigger deletion
       } else {
-        setValue(lastValidValueRef.current)  // Dismiss if no existing weight
+        setValue(lastValidValueRef.current) // Dismiss if no existing weight
       }
       return
     }
@@ -166,7 +166,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
       <div className="flex flex-col items-center justify-center p-2">
         <input
           ref={inputRef}
-          type="number"
+          type="text"
+          inputMode="decimal"
           value={value}
           onChange={handleInputChange}
           onBlur={handleBlur}
