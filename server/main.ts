@@ -138,6 +138,23 @@ const server = Bun.serve({
         }
       }
 
+      if (url.pathname === "/api/export/sqlite" && method === "GET") {
+        try {
+          const file = Bun.file(DATABASE_PATH)
+          const fileName = `weight-tracker-${new Date().toISOString().split('T')[0]}.db`
+          
+          return new Response(file, {
+            headers: {
+              "Content-Type": "application/octet-stream",
+              "Content-Disposition": `attachment; filename="${fileName}"`,
+            },
+          })
+        } catch (error) {
+          console.error("Failed to export SQLite file:", error)
+          return new Response("Failed to export database", { status: 500 })
+        }
+      }
+
       return new Response("Not Found", { status: 404 })
     }
 
