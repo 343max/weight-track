@@ -104,8 +104,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
           <table className="border-collapse w-full">
             <thead>
               <tr className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white">
-                <th className="sticky-col p-4 text-left font-semibold min-w-[140px] bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
-                  <span className="text-white">Name</span>
+                <th className="sticky-col p-4 text-left font-semibold bg-gradient-to-r from-blue-600 to-indigo-600 border-r border-blue-500">
                 </th>
                 {dateColumns.map((date) => (
                   <th
@@ -123,19 +122,14 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
               {users.map((user, index) => (
                 <tr key={user.id} className="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                   <td
-                    className="sticky-col p-4 font-semibold border-r border-gray-200 dark:border-gray-600"
-                    style={{ 
-                      backgroundColor: user.color + '30',
-                      backdropFilter: 'blur(10px)'
-                    }}
+                    className="sticky-col p-4 font-semibold border-r border-gray-200 dark:border-gray-600 bg-white dark:bg-black whitespace-nowrap"
                   >
-                    <div className="flex items-center space-x-3">
-                      <div 
-                        className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-                        style={{ backgroundColor: user.color }}
-                      ></div>
-                      <span className="text-gray-900 dark:text-gray-100 font-medium">{user.name}</span>
-                    </div>
+                    <span 
+                      className="font-bold"
+                      style={{ color: user.color }}
+                    >
+                      {user.name}
+                    </span>
                   </td>
                   {dateColumns.map((date) => (
                     <td
