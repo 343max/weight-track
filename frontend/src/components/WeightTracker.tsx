@@ -102,9 +102,6 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
   return (
     <div>
       <div>
-        <div className="mb-4">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-2">Weight Tracker</h1>
-        </div>
         <div ref={tableRef} className="overflow-x-auto bg-white dark:bg-gray-800">
           <table className="table-auto relative">
             <thead>
