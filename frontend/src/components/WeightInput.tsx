@@ -20,6 +20,11 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
   const lastValidValueRef = useRef<string>("")
 
+  // Helper function to normalize decimal separator
+  const normalizeDecimal = (input: string): string => {
+    return input.replace(",", ".")
+  }
+
   useEffect(() => {
     if (initialWeight !== null) {
       setValue(initialWeight.toString())
@@ -46,7 +51,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
         return
       }
 
-      const numericValue = parseFloat(weightValue)
+      const normalizedValue = normalizeDecimal(weightValue)
+      const numericValue = parseFloat(normalizedValue)
       if (isNaN(numericValue) || numericValue <= 0) {
         return
       }
@@ -87,10 +93,11 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
       return
     }
 
-    const numericValue = parseFloat(value)
+    const normalizedValue = normalizeDecimal(value)
+    const numericValue = parseFloat(normalizedValue)
 
     // Handle explicit "0" as deletion request
-    if (value.trim() === "0") {
+    if (normalizedValue.trim() === "0") {
       if (initialWeight !== null) {
         handleSave("") // Trigger deletion
       } else {
