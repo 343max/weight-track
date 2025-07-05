@@ -123,14 +123,8 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
                     data: xLabels,
                   },
                 ]}
-                yAxis={[
-                  {
-                    label: "Gewicht (kg)",
-                  },
-                ]}
                 margin={{ left: 60, right: 30, top: 30, bottom: 60 }}
                 grid={{ vertical: true, horizontal: true }}
-                tooltip={{ trigger: "item" }}
                 sx={{
                   "& .MuiChartsAxis-tickLabel": {
                     fontSize: "12px",
