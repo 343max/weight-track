@@ -1,3 +1,4 @@
+import { expect, describe, it } from "bun:test"
 import { getLastFriday, getAllFridaysBetween, generateDateColumns } from "./utils"
 
 describe("Date utilities", () => {
