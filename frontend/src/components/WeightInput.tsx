@@ -127,12 +127,14 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     }
 
     const isLoss = change < 0
-    const colorClass = isLoss ? 'text-green-500 dark:text-green-400' : 'text-red-500 dark:text-red-400'
+    const colorClass = isLoss 
+      ? 'text-green-600 dark:text-green-400 font-semibold' 
+      : 'text-red-600 dark:text-red-400 font-semibold'
     const arrow = isLoss ? '↓' : '↑'
     const absChange = Math.abs(change).toFixed(1)
 
     return (
-      <div className={`${colorClass} text-xs text-center mt-1 font-medium`}>
+      <div className={`${colorClass} text-xs text-center mt-1`}>
         {arrow} {absChange}
       </div>
     )
