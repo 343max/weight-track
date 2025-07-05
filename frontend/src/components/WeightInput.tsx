@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react'
-import type { WeightChangeInfo } from '../types'
+import { useState, useEffect, useRef } from "react"
+import type { WeightChangeInfo } from "../types"
 
 interface WeightInputProps {
   userId: number
@@ -11,14 +11,14 @@ interface WeightInputProps {
 }
 
 function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, onDelete }: WeightInputProps) {
-  const [value, setValue] = useState(initialWeight?.toString() || '')
+  const [value, setValue] = useState(initialWeight?.toString() || "")
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [showShake, setShowShake] = useState(false)
   const [displayInfo, setDisplayInfo] = useState<WeightChangeInfo | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
   const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
-  const lastValidValueRef = useRef<string>('')
+  const lastValidValueRef = useRef<string>("")
 
   useEffect(() => {
     if (initialWeight !== null) {
@@ -36,12 +36,12 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   const handleSave = async (weightValue: string) => {
     setIsSaving(true)
     try {
-      if (!weightValue || weightValue.trim() === '') {
+      if (!weightValue || weightValue.trim() === "") {
         // Delete the weight if field is empty and there was a previous value
         if (initialWeight !== null) {
           await onDelete(userId, date)
           setDisplayInfo(null)
-          lastValidValueRef.current = ''
+          lastValidValueRef.current = ""
         }
         return
       }
@@ -55,7 +55,7 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
       setDisplayInfo(result)
       lastValidValueRef.current = numericValue.toString()
     } catch (error) {
-      console.error('Failed to save/delete weight:', error)
+      console.error("Failed to save/delete weight:", error)
     } finally {
       setIsSaving(false)
     }
@@ -76,18 +76,30 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
 
   const handleBlur = () => {
     setIsEditing(false)
-    
+
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
     }
 
-    // Allow empty value (for deletion)
-    if (!value || value.trim() === '') {
-      handleSave(value)
+    // If empty or invalid, dismiss the input without action
+    if (!value || value.trim() === "") {
+      setValue(lastValidValueRef.current)
       return
     }
 
     const numericValue = parseFloat(value)
+    
+    // Handle explicit "0" as deletion request
+    if (value.trim() === "0") {
+      if (initialWeight !== null) {
+        handleSave("")  // Trigger deletion
+      } else {
+        setValue(lastValidValueRef.current)  // Dismiss if no existing weight
+      }
+      return
+    }
+
+    // Dismiss invalid inputs
     if (isNaN(numericValue) || numericValue <= 0) {
       setShowShake(true)
       setValue(lastValidValueRef.current)
@@ -98,9 +110,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     handleSave(value)
   }
 
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       inputRef.current?.blur()
     }
   }
@@ -113,7 +124,7 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
 
     // Use weightChangeInfo prop if available, otherwise use displayInfo
     const changeInfo = weightChangeInfo || displayInfo
-    
+
     if (!changeInfo || !changeInfo.previousWeight || !changeInfo.weight) {
       return null
     }
@@ -127,10 +138,10 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
     }
 
     const isLoss = change < 0
-    const colorClass = isLoss 
-      ? 'text-green-600 dark:text-green-400 font-semibold' 
-      : 'text-red-600 dark:text-red-400 font-semibold'
-    const arrow = isLoss ? '↓' : '↑'
+    const colorClass = isLoss
+      ? "text-green-600 dark:text-green-400 font-semibold"
+      : "text-red-600 dark:text-red-400 font-semibold"
+    const arrow = isLoss ? "↓" : "↑"
     const absChange = Math.abs(change).toFixed(1)
 
     return (
@@ -166,8 +177,8 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
             text-gray-900 dark:text-gray-100
             focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
             shadow-sm
-            ${showShake ? 'shake' : ''}
-            ${isSaving ? 'opacity-50' : ''}
+            ${showShake ? "shake" : ""}
+            ${isSaving ? "opacity-50" : ""}
           `}
           placeholder="--"
           step="0.1"
@@ -180,19 +191,17 @@ function WeightInput({ userId, date, initialWeight, weightChangeInfo, onSave, on
   }
 
   return (
-    <div 
+    <div
       className="flex flex-col items-center justify-center p-2 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 rounded-lg transition-colors min-h-[60px]"
       onClick={handleClick}
     >
       <div className="text-center">
         <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-          {initialWeight !== null ? initialWeight.toFixed(1) : '--'}
+          {initialWeight !== null ? initialWeight.toFixed(1) : "--"}
         </div>
         {renderWeightChange()}
       </div>
-      {isSaving && (
-        <div className="text-xs text-blue-500 dark:text-blue-400 mt-1">Saving...</div>
-      )}
+      {isSaving && <div className="text-xs text-blue-500 dark:text-blue-400 mt-1">Saving...</div>}
     </div>
   )
 }
