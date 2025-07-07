@@ -135,7 +135,7 @@ function App() {
   return (
     <div className="bg-white dark:bg-gray-900 min-h-screen">
       {/* Tab Bar */}
-      <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="flex space-x-8 px-6">
           <button
             onClick={() => setActiveTab("zahlen")}
