@@ -59,6 +59,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
         data: userData,
         color: user.color,
         connectNulls: false,
+        showMark: false,
       }
     })
 
@@ -110,28 +111,30 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
                   },
                 },
               ]}
-              yAxis={[{ 
-                position: "right", 
-                width: 30,
-                tickLabelStyle: {
-                  fill: "currentColor",
+              yAxis={[
+                {
+                  position: "right",
+                  width: 30,
+                  tickLabelStyle: {
+                    fill: "currentColor",
+                  },
                 },
-              }]}
+              ]}
               slotProps={{
                 /* @ts-expect-error */
                 legend: { hidden: true },
               }}
               sx={{
-                '& .MuiChartsAxis-tickLabel': {
-                  fill: 'currentColor',
+                "& .MuiChartsAxis-tickLabel": {
+                  fill: "currentColor",
                 },
-                '& .MuiChartsAxis-line': {
-                  stroke: 'currentColor',
+                "& .MuiChartsAxis-line": {
+                  stroke: "currentColor",
                 },
-                '& .MuiChartsAxis-tick': {
-                  stroke: 'currentColor',
+                "& .MuiChartsAxis-tick": {
+                  stroke: "currentColor",
                 },
-                color: 'inherit',
+                color: "inherit",
               }}
             />
           ) : (
