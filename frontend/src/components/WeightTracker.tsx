@@ -88,26 +88,26 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
     const currentYear = new Date().getFullYear()
     const dateYear = date.getFullYear()
     const dayOfWeek = date.getDay()
-    
-    const day = date.getDate().toString().padStart(2, '0')
-    const month = (date.getMonth() + 1).toString().padStart(2, '0')
-    
+
+    const day = date.getDate().toString().padStart(2, "0")
+    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+
     // German weekday abbreviations
-    const germanWeekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
-    
-    let formattedDate = ''
+    const germanWeekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+
+    let formattedDate = ""
     if (dateYear === currentYear) {
       formattedDate = `${day}.${month}`
     } else {
       const year = dateYear.toString().slice(-2)
       formattedDate = `${day}.${month}.${year}`
     }
-    
+
     // If it's not Friday (day 5), prepend the German weekday
     if (dayOfWeek !== 5) {
       formattedDate = `${germanWeekdays[dayOfWeek]} ${formattedDate}`
     }
-    
+
     return formattedDate
   }
 
@@ -123,9 +123,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
                   <th
                     key={date}
                     className={`w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
-                      index % 2 === 0 
-                        ? 'bg-blue-50 dark:bg-blue-900/20' 
-                        : 'bg-blue-100 dark:bg-blue-800/20'
+                      index % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
                     }`}
                   >
                     <span className="text-gray-800 dark:text-white text-sm">{formatDate(date)}</span>
@@ -136,7 +134,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
             <tbody>
               {users.map((user) => (
                 <tr key={user.id}>
-                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800">
+                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 px-2">
                     <span className="font-bold" style={{ color: user.color }}>
                       {user.name}
                     </span>
@@ -145,9 +143,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
                     <td
                       key={`${user.id}-${date}`}
                       className={`first:sticky w-[80px] min-w-[80px] max-w-[80px] ${
-                        index % 2 === 0 
-                          ? 'bg-blue-50 dark:bg-blue-900/20' 
-                          : 'bg-blue-100 dark:bg-blue-800/20'
+                        index % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
                       }`}
                     >
                       <WeightInput
