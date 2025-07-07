@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react"
 import type { User, WeightEntry, WeightChangeInfo } from "../types"
 import { WeightInput } from "./WeightInput"
 
-interface WeightTrackerProps {
+interface WeightTableProps {
   users: User[]
   weights: Record<string, WeightEntry>
   dateColumns: string[]
@@ -10,7 +10,7 @@ interface WeightTrackerProps {
   onDeleteWeight: (userId: number, date: string) => Promise<any>
 }
 
-function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeight }: WeightTrackerProps) {
+function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight }: WeightTableProps) {
   const tableRef = useRef<HTMLDivElement>(null)
   const [weightChanges, setWeightChanges] = useState<Record<string, WeightChangeInfo>>({})
   const hasScrolledRef = useRef(false)
@@ -166,4 +166,4 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
   )
 }
 
-export default WeightTracker
+export default WeightTable

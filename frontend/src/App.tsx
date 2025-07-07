@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import WeightTracker from "./components/WeightTracker"
+import WeightTable from "./components/WeightTable"
 import WeightChart from "./components/WeightChart"
 import Export from "./components/Export"
 import type { User, WeightEntry } from "./types"
@@ -209,7 +209,7 @@ function App() {
       {/* Tab Content */}
       <div className="flex-1">
         {activeTab === "zahlen" ? (
-          <WeightTracker
+          <WeightTable
             users={data.users}
             weights={data.weights}
             dateColumns={data.dateColumns}
