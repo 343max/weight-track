@@ -95,7 +95,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
       </div>
 
       {/* Chart */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm">
+      <div className="bg-white dark:bg-gray-800 rounded-lg p-4 shadow-sm text-gray-900 dark:text-white">
         <div style={{ width: "100%", height: chartHeight }}>
           {series.length > 0 ? (
             <LineChart
@@ -105,12 +105,33 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
                 {
                   scaleType: "point",
                   data: xLabels,
+                  tickLabelStyle: {
+                    fill: "currentColor",
+                  },
                 },
               ]}
-              yAxis={[{ position: "right", width: 30 }]}
+              yAxis={[{ 
+                position: "right", 
+                width: 30,
+                tickLabelStyle: {
+                  fill: "currentColor",
+                },
+              }]}
               slotProps={{
                 /* @ts-expect-error */
                 legend: { hidden: true },
+              }}
+              sx={{
+                '& .MuiChartsAxis-tickLabel': {
+                  fill: 'currentColor',
+                },
+                '& .MuiChartsAxis-line': {
+                  stroke: 'currentColor',
+                },
+                '& .MuiChartsAxis-tick': {
+                  stroke: 'currentColor',
+                },
+                color: 'inherit',
               }}
             />
           ) : (
