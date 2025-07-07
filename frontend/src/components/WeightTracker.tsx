@@ -17,7 +17,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
 
   useEffect(() => {
     if (tableRef.current && !hasScrolledRef.current) {
-      tableRef.current.scrollLeft = tableRef.current.scrollWidth
+      tableRef.current.scrollTop = 0
       hasScrolledRef.current = true
     }
   }, [dateColumns])
@@ -114,36 +114,36 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
   return (
     <div>
       <div>
-        <div ref={tableRef} className="overflow-x-auto bg-white dark:bg-gray-800">
-          <table className="table-auto relative">
+        <div ref={tableRef} className="overflow-y-auto bg-white dark:bg-gray-800">
+          <table className="table-auto relative w-full h-full overflow-x-auto">
             <thead>
               <tr>
-                <th className="sticky left-0 z-10 bg-white dark:bg-gray-800"></th>
-                {dateColumns.map((date, index) => (
+                <th className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-4 text-left font-semibold"></th>
+                {users.map((user, index) => (
                   <th
-                    key={date}
-                    className={`w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
+                    key={user.id}
+                    className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
                       index % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
                     }`}
                   >
-                    <span className="text-gray-800 dark:text-white text-sm">{formatDate(date)}</span>
+                    <span className="font-bold text-sm" style={{ color: user.color }}>
+                      {user.name}
+                    </span>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 px-2">
-                    <span className="font-bold" style={{ color: user.color }}>
-                      {user.name}
-                    </span>
+              {[...dateColumns].reverse().map((date) => (
+                <tr key={date}>
+                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 px-2 py-2 text-right">
+                    <span className="text-gray-800 dark:text-white text-sm font-medium">{formatDate(date)}</span>
                   </td>
-                  {dateColumns.map((date, index) => (
+                  {users.map((user, userIndex) => (
                     <td
                       key={`${user.id}-${date}`}
-                      className={`first:sticky w-[80px] min-w-[80px] max-w-[80px] ${
-                        index % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
+                      className={`w-[80px] min-w-[80px] max-w-[80px] ${
+                        userIndex % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
                       }`}
                     >
                       <WeightInput
