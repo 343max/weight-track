@@ -12,13 +12,16 @@ async function setupSampleData() {
   console.log("Setting up sample data...");
   
   db.exec(`
-    CREATE TABLE IF NOT EXISTS users (
+    DROP TABLE IF EXISTS weights;
+    DROP TABLE IF EXISTS users;
+    
+    CREATE TABLE users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
       color TEXT
     );
 
-    CREATE TABLE IF NOT EXISTS weights (
+    CREATE TABLE weights (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER NOT NULL,
       date TEXT NOT NULL,
@@ -32,23 +35,24 @@ async function setupSampleData() {
   const insertWeight = db.prepare("INSERT OR IGNORE INTO weights (user_id, date, weight_kg) VALUES (?, ?, ?)");
   
   insertUser.run("Alice", "#FF6B6B");
-  insertUser.run("Bob", "#4ECDC4");
-  insertUser.run("Charlie", "#45B7D1");
-  insertUser.run("Diana", "#96CEB4");
+  insertUser.run("Bobby", "#4ECDC4");
+  insertUser.run("Foobar", "#45B7D1");
+  insertUser.run("Ben", "#96CEB4");
   
   const dates = [
-    "2024-06-28",
-    "2024-07-05",
-    "2024-07-12",
-    "2024-07-19",
-    "2024-07-26",
+    "2025-06-06",
+    "2025-06-13",
+    "2025-06-20",
+    "2025-06-27",
+    "2025-07-04",
+    "2025-07-11",
   ];
   
   const weights = [
-    [1, 70.5, 70.2, 69.8, 69.5, 69.1],
-    [2, 82.3, 82.1, 81.9, 81.7, 81.4],
-    [3, 75.0, 74.8, 74.6, 74.3, 74.0],
-    [4, 68.2, 68.0, 67.8, 67.5, 67.2],
+    [1, 68.2, 68.0, 67.8, 67.5, 67.2, 67.0],
+    [2, 85.4, 85.1, 84.9, 84.6, 84.3, 84.0],
+    [3, 92.8, 92.5, 92.2, 91.9, 91.6, 91.3],
+    [4, 73.1, 72.9, 72.6, 72.3, 72.0, 71.8],
   ];
   
   for (let i = 0; i < dates.length; i++) {
