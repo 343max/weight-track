@@ -134,6 +134,23 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
                 "& .MuiChartsAxis-tick": {
                   stroke: "currentColor",
                 },
+                "& .MuiChartsXAxis-line": {
+                  stroke: "currentColor",
+                },
+                "& .MuiChartsYAxis-line": {
+                  stroke: "currentColor",
+                },
+                "& .MuiChartsXAxis-tick": {
+                  stroke: "currentColor",
+                },
+                "& .MuiChartsYAxis-tick": {
+                  stroke: "currentColor",
+                },
+                "& .MuiChartsAxis-root": {
+                  "& line": {
+                    stroke: "currentColor",
+                  },
+                },
                 color: "inherit",
               }}
             />
