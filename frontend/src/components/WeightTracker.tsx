@@ -115,7 +115,7 @@ function WeightTracker({ users, weights, dateColumns, onSaveWeight, onDeleteWeig
     <div>
       <div>
         <div ref={tableRef} className="overflow-y-auto bg-white dark:bg-gray-800">
-          <table className="table-auto relative w-full h-full overflow-x-auto">
+          <table className="table-auto relative overflow-x-auto">
             <thead>
               <tr>
                 <th className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-4 text-left font-semibold"></th>
