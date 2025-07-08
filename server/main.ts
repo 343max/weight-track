@@ -1,5 +1,6 @@
 import { WeightTracker } from "./database"
 import { generateDateColumns } from "./utils"
+import { AuthService } from "./auth"
 import { mkdir } from "fs/promises"
 import { dirname } from "path"
 import { existsSync } from "fs"
@@ -16,10 +17,17 @@ if (APP_SECRET === undefined) {
 await mkdir(dirname(DATABASE_PATH), { recursive: true })
 
 const db = new WeightTracker(DATABASE_PATH)
+const authService = new AuthService(db)
 
 function validateSecret(request: Request): boolean {
   const url = new URL(request.url)
   return url.searchParams.get("secret") === APP_SECRET
+}
+
+function requireAuth(request: Request): number | null {
+  const sessionId = authService.getSessionFromRequest(request)
+  if (!sessionId) return null
+  return authService.validateSession(sessionId)
 }
 
 function createUnauthorizedResponse(): Response {
@@ -51,7 +59,64 @@ const server = Bun.serve({
     const method = request.method
 
     if (url.pathname.startsWith("/api/")) {
-      if (!validateSecret(request)) {
+      // Public authentication endpoints
+      if (url.pathname === "/api/login" && method === "POST") {
+        const body = await request.json()
+        const { username, password } = body as { username: string; password: string }
+
+        if (!username || !password) {
+          return new Response("Missing credentials", { status: 400 })
+        }
+
+        const sessionId = await authService.authenticate(username, password)
+        if (!sessionId) {
+          return new Response("Invalid credentials", { status: 401 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": authService.createAuthCookie(sessionId)
+          }
+        })
+      }
+
+      if (url.pathname === "/api/logout" && method === "POST") {
+        const sessionId = authService.getSessionFromRequest(request)
+        if (sessionId) {
+          authService.logout(sessionId)
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": authService.createLogoutCookie()
+          }
+        })
+      }
+
+      if (url.pathname === "/api/change-password" && method === "POST") {
+        const userId = requireAuth(request)
+        if (!userId) {
+          return new Response("Unauthorized", { status: 401 })
+        }
+
+        const body = await request.json()
+        const { newPassword } = body as { newPassword: string }
+
+        if (!newPassword) {
+          return new Response("Missing password", { status: 400 })
+        }
+
+        authService.changePassword(userId, newPassword)
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { "Content-Type": "application/json" }
+        })
+      }
+
+      // Protected API endpoints - require authentication
+      const userId = requireAuth(request)
+      if (!userId) {
         return new Response("Unauthorized", { status: 401 })
       }
 
@@ -130,7 +195,76 @@ const server = Bun.serve({
       return new Response("Not Found", { status: 404 })
     }
 
-    if (!validateSecret(request)) {
+    // Check authentication for main page
+    const userId = requireAuth(request)
+    if (!userId) {
+      // Serve login page instead of unauthorized
+      if (url.pathname === "/") {
+        const loginHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Weight Tracker - Login</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f5f5f5; }
+              .login-form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+              .form-group { margin-bottom: 1rem; }
+              label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+              input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
+              button { width: 100%; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
+              button:hover { background: #0056b3; }
+              .error { color: #dc3545; margin-top: 0.5rem; }
+              .title { text-align: center; margin-bottom: 2rem; color: #333; }
+            </style>
+          </head>
+          <body>
+            <div class="login-form">
+              <h2 class="title">Weight Tracker</h2>
+              <form id="loginForm">
+                <div class="form-group">
+                  <label for="username">Username:</label>
+                  <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                  <label for="password">Password:</label>
+                  <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit">Login</button>
+                <div id="error" class="error"></div>
+              </form>
+            </div>
+            <script>
+              document.getElementById('loginForm').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                const errorEl = document.getElementById('error');
+                
+                try {
+                  const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                  });
+                  
+                  if (response.ok) {
+                    window.location.reload();
+                  } else {
+                    errorEl.textContent = 'Invalid credentials';
+                  }
+                } catch (error) {
+                  errorEl.textContent = 'Login failed';
+                }
+              });
+            </script>
+          </body>
+        </html>
+        `;
+        return new Response(loginHtml, {
+          headers: { "Content-Type": "text/html" }
+        });
+      }
       return createUnauthorizedResponse()
     }
 
