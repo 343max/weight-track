@@ -2,40 +2,10 @@ import { useState, useEffect } from "react"
 import WeightTable from "./components/WeightTable"
 import WeightChart from "./components/WeightChart"
 import Export from "./components/Export"
+import PasswordChange from "./components/PasswordChange"
+import LoginForm from "./components/LoginForm"
 import type { User, WeightEntry } from "./types"
 
-// Cookie utility functions
-const setCookie = (name: string, value: string, days: number) => {
-  const expires = new Date()
-  expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000)
-  document.cookie = `${name}=${value};expires=${expires.toUTCString()};path=/`
-}
-
-const getCookie = (name: string): string | null => {
-  const nameEQ = name + "="
-  const ca = document.cookie.split(';')
-  for (let i = 0; i < ca.length; i++) {
-    let c = ca[i]
-    if (c) {
-      while (c.charAt(0) === ' ') c = c.substring(1, c.length)
-      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length)
-    }
-  }
-  return null
-}
-
-const getSecret = (): string | null => {
-  // First check URL parameter
-  const urlSecret = new URLSearchParams(window.location.search).get("secret")
-  if (urlSecret) {
-    // Store in cookie for 1 year
-    setCookie("weight_tracker_secret", urlSecret, 365)
-    return urlSecret
-  }
-  
-  // Fallback to cookie
-  return getCookie("weight_tracker_secret")
-}
 
 interface AppData {
   users: User[]
@@ -47,18 +17,52 @@ function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken" | "export">("zahlen")
+  const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken" | "export" | "password">("zahlen")
   const [chartKey, setChartKey] = useState(0)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
-  const fetchData = async () => {
+  const checkAuth = async () => {
     try {
-      const secret = getSecret()
-      if (!secret) {
-        throw new Error("Secret parameter is required")
+      const response = await fetch("/api/data", {
+        credentials: "include"
+      })
+      
+      if (response.status === 401) {
+        setIsAuthenticated(false)
+        setLoading(false)
+        return false
+      }
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch data")
       }
 
-      const response = await fetch(`/api/data?secret=${secret}`)
+      const appData = await response.json()
+      setData(appData)
+      setError(null)
+      setIsAuthenticated(true)
+      setLoading(false)
+      return true
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+      setLoading(false)
+      return false
+    }
+  }
+
+  const fetchData = async () => {
+    if (!isAuthenticated) return
+    
+    try {
+      const response = await fetch("/api/data", {
+        credentials: "include"
+      })
+      
       if (!response.ok) {
+        if (response.status === 401) {
+          setIsAuthenticated(false)
+          return
+        }
         throw new Error("Failed to fetch data")
       }
 
@@ -67,23 +71,17 @@ function App() {
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setLoading(false)
     }
   }
 
   const saveWeight = async (userId: number, date: string, weight: number) => {
     try {
-      const secret = getSecret()
-      if (!secret) {
-        throw new Error("Secret parameter is required")
-      }
-
-      const response = await fetch(`/api/weight?secret=${secret}`, {
+      const response = await fetch("/api/weight", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           userId,
           date,
@@ -92,6 +90,10 @@ function App() {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setIsAuthenticated(false)
+          return
+        }
         throw new Error("Failed to save weight")
       }
 
@@ -108,16 +110,12 @@ function App() {
 
   const deleteWeight = async (userId: number, date: string) => {
     try {
-      const secret = getSecret()
-      if (!secret) {
-        throw new Error("Secret parameter is required")
-      }
-
-      const response = await fetch(`/api/weight?secret=${secret}`, {
+      const response = await fetch("/api/weight", {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           userId,
           date,
@@ -125,6 +123,10 @@ function App() {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          setIsAuthenticated(false)
+          return
+        }
         throw new Error("Failed to delete weight")
       }
 
@@ -137,8 +139,30 @@ function App() {
     }
   }
 
+  const handleLogin = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
+      })
+
+      if (response.ok) {
+        await checkAuth()
+        return true
+      }
+      return false
+    } catch (err) {
+      console.error("Login failed:", err)
+      return false
+    }
+  }
+
   useEffect(() => {
-    fetchData()
+    checkAuth()
   }, [])
 
   if (loading) {
@@ -147,6 +171,10 @@ function App() {
         <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
       </div>
     )
+  }
+
+  if (isAuthenticated === false) {
+    return <LoginForm onLogin={handleLogin} />
   }
 
   if (error) {
@@ -203,6 +231,16 @@ function App() {
           >
             Export
           </button>
+          <button
+            onClick={() => setActiveTab("password")}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === "password"
+                ? "border-blue-500 text-blue-600 dark:text-blue-400"
+                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+            }`}
+          >
+            Password
+          </button>
         </div>
       </div>
 
@@ -223,12 +261,14 @@ function App() {
             weights={data.weights}
             dateColumns={data.dateColumns}
           />
-        ) : (
+        ) : activeTab === "export" ? (
           <Export
             users={data.users}
             weights={data.weights}
             dateColumns={data.dateColumns}
           />
+        ) : (
+          <PasswordChange />
         )}
       </div>
     </div>

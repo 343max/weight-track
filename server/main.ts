@@ -1,5 +1,6 @@
 import { WeightTracker } from "./database"
 import { generateDateColumns } from "./utils"
+import { AuthService } from "./auth"
 import { mkdir } from "fs/promises"
 import { dirname } from "path"
 import { existsSync } from "fs"
@@ -16,10 +17,17 @@ if (APP_SECRET === undefined) {
 await mkdir(dirname(DATABASE_PATH), { recursive: true })
 
 const db = new WeightTracker(DATABASE_PATH)
+const authService = new AuthService(db)
 
 function validateSecret(request: Request): boolean {
   const url = new URL(request.url)
   return url.searchParams.get("secret") === APP_SECRET
+}
+
+function requireAuth(request: Request): number | null {
+  const sessionId = authService.getSessionFromRequest(request)
+  if (!sessionId) return null
+  return authService.validateSession(sessionId)
 }
 
 function createUnauthorizedResponse(): Response {
@@ -51,7 +59,64 @@ const server = Bun.serve({
     const method = request.method
 
     if (url.pathname.startsWith("/api/")) {
-      if (!validateSecret(request)) {
+      // Public authentication endpoints
+      if (url.pathname === "/api/login" && method === "POST") {
+        const body = await request.json()
+        const { username, password } = body as { username: string; password: string }
+
+        if (!username || !password) {
+          return new Response("Missing credentials", { status: 400 })
+        }
+
+        const sessionId = await authService.authenticate(username, password)
+        if (!sessionId) {
+          return new Response("Invalid credentials", { status: 401 })
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": authService.createAuthCookie(sessionId)
+          }
+        })
+      }
+
+      if (url.pathname === "/api/logout" && method === "POST") {
+        const sessionId = authService.getSessionFromRequest(request)
+        if (sessionId) {
+          authService.logout(sessionId)
+        }
+
+        return new Response(JSON.stringify({ success: true }), {
+          headers: {
+            "Content-Type": "application/json",
+            "Set-Cookie": authService.createLogoutCookie()
+          }
+        })
+      }
+
+      if (url.pathname === "/api/change-password" && method === "POST") {
+        const userId = requireAuth(request)
+        if (!userId) {
+          return new Response("Unauthorized", { status: 401 })
+        }
+
+        const body = await request.json()
+        const { newPassword } = body as { newPassword: string }
+
+        if (!newPassword) {
+          return new Response("Missing password", { status: 400 })
+        }
+
+        authService.changePassword(userId, newPassword)
+        return new Response(JSON.stringify({ success: true }), {
+          headers: { "Content-Type": "application/json" }
+        })
+      }
+
+      // Protected API endpoints - require authentication
+      const userId = requireAuth(request)
+      if (!userId) {
         return new Response("Unauthorized", { status: 401 })
       }
 
@@ -130,10 +195,16 @@ const server = Bun.serve({
       return new Response("Not Found", { status: 404 })
     }
 
-    if (!validateSecret(request)) {
-      return createUnauthorizedResponse()
+    // For assets and static files, don't require authentication
+    if (url.pathname.startsWith("/assets/")) {
+      const filePath = "./dist" + url.pathname
+      if (existsSync(filePath)) {
+        const file = Bun.file(filePath)
+        return new Response(file)
+      }
     }
 
+    // Always serve the React app for the root path - let the frontend handle auth
     if (url.pathname === "/") {
       if (existsSync("./dist/index.html")) {
         const file = Bun.file("./dist/index.html")
@@ -145,14 +216,6 @@ const server = Bun.serve({
           headers: { "Content-Type": "text/html" },
           status: 404,
         })
-      }
-    }
-
-    if (url.pathname.startsWith("/assets/")) {
-      const filePath = "./dist" + url.pathname
-      if (existsSync(filePath)) {
-        const file = Bun.file(filePath)
-        return new Response(file)
       }
     }
 
