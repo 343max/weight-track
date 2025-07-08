@@ -4,6 +4,7 @@ export interface User {
   id: number;
   name: string;
   color: string;
+  password: string;
 }
 
 export interface Weight {
@@ -31,7 +32,8 @@ export class WeightTracker {
       CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         name TEXT NOT NULL,
-        color TEXT
+        color TEXT,
+        password TEXT
       );
 
       CREATE TABLE IF NOT EXISTS weights (
@@ -43,6 +45,23 @@ export class WeightTracker {
         UNIQUE(user_id, date)
       );
     `);
+    
+    // Add password column to existing users table if it doesn't exist
+    this.migrateDatabase();
+  }
+
+  private migrateDatabase() {
+    try {
+      // Check if password column exists
+      const tableInfo = this.db.prepare("PRAGMA table_info(users)").all() as any[];
+      const hasPasswordColumn = tableInfo.some(column => column.name === 'password');
+      
+      if (!hasPasswordColumn) {
+        this.db.exec("ALTER TABLE users ADD COLUMN password TEXT");
+      }
+    } catch (error) {
+      console.error("Database migration failed:", error);
+    }
   }
 
   getAllUsers(): User[] {
@@ -114,6 +133,16 @@ export class WeightTracker {
     const stmt = this.db.prepare("DELETE FROM weights WHERE user_id = ? AND date = ?");
     const result = stmt.run(userId, date);
     return result.changes > 0;
+  }
+
+  getUserByName(name: string): User | null {
+    const stmt = this.db.prepare("SELECT * FROM users WHERE name = ?");
+    return stmt.get(name) as User | null;
+  }
+
+  updateUserPassword(userId: number, hashedPassword: string): void {
+    const stmt = this.db.prepare("UPDATE users SET password = ? WHERE id = ?");
+    stmt.run(hashedPassword, userId);
   }
 
   close() {

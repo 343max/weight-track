@@ -39,13 +39,15 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
   const downloadSQLite = async () => {
     try {
       setIsDownloading(true)
-      const secret = new URLSearchParams(window.location.search).get("secret")
-      if (!secret) {
-        throw new Error("Secret parameter is required")
-      }
-
-      const response = await fetch(`/api/export/sqlite?secret=${secret}`)
+      const response = await fetch("/api/export/sqlite", {
+        credentials: "include"
+      })
+      
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.href = "/"
+          return
+        }
         throw new Error("Failed to download SQLite file")
       }
 
