@@ -17,6 +17,10 @@ RUN bun run build
 # Build backend - compile server to standalone binary
 RUN bun build server/main.ts --compile --outfile weight-tracker
 
+# Build password management tools as binaries
+RUN bun build server/generate-first-passwords.ts --compile --outfile generate-first-passwords
+RUN bun build server/users-without-passwords.ts --compile --outfile users-without-passwords
+
 # Install Caddy on a base that supports Bun binaries
 FROM debian:12-slim AS runtime
 
@@ -37,6 +41,8 @@ RUN curl -1sLf 'https://dl.cloudsmith.io/public/caddy/stable/gpg.key' | gpg --de
 # Copy built files from base
 COPY --from=base /app/dist /var/www/html
 COPY --from=base /app/weight-tracker /usr/local/bin/weight-tracker
+COPY --from=base /app/generate-first-passwords /usr/local/bin/generate-first-passwords
+COPY --from=base /app/users-without-passwords /usr/local/bin/users-without-passwords
 
 # Copy Caddyfile
 COPY Caddyfile /etc/caddy/Caddyfile
