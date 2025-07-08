@@ -136,7 +136,7 @@ export class WeightTracker {
   }
 
   getUserByName(name: string): User | null {
-    const stmt = this.db.prepare("SELECT * FROM users WHERE name = ?");
+    const stmt = this.db.prepare("SELECT * FROM users WHERE LOWER(name) = LOWER(?)");
     return stmt.get(name) as User | null;
   }
 

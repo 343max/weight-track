@@ -9,7 +9,7 @@ export interface Session {
 
 export class SessionManager {
   private sessions: Map<string, Session> = new Map();
-  private readonly sessionTimeout = 24 * 60 * 60 * 1000; // 24 hours
+  private readonly sessionTimeout = 365 * 24 * 60 * 60 * 1000; // 1 year
 
   generateSessionId(): string {
     return randomBytes(32).toString('hex');

@@ -3,6 +3,7 @@ import WeightTable from "./components/WeightTable"
 import WeightChart from "./components/WeightChart"
 import Export from "./components/Export"
 import PasswordChange from "./components/PasswordChange"
+import LoginForm from "./components/LoginForm"
 import type { User, WeightEntry } from "./types"
 
 
@@ -18,8 +19,40 @@ function App() {
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken" | "export" | "password">("zahlen")
   const [chartKey, setChartKey] = useState(0)
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
+
+  const checkAuth = async () => {
+    try {
+      const response = await fetch("/api/data", {
+        credentials: "include"
+      })
+      
+      if (response.status === 401) {
+        setIsAuthenticated(false)
+        setLoading(false)
+        return false
+      }
+      
+      if (!response.ok) {
+        throw new Error("Failed to fetch data")
+      }
+
+      const appData = await response.json()
+      setData(appData)
+      setError(null)
+      setIsAuthenticated(true)
+      setLoading(false)
+      return true
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An error occurred")
+      setLoading(false)
+      return false
+    }
+  }
 
   const fetchData = async () => {
+    if (!isAuthenticated) return
+    
     try {
       const response = await fetch("/api/data", {
         credentials: "include"
@@ -27,8 +60,7 @@ function App() {
       
       if (!response.ok) {
         if (response.status === 401) {
-          // User is not authenticated, redirect to login
-          window.location.href = "/"
+          setIsAuthenticated(false)
           return
         }
         throw new Error("Failed to fetch data")
@@ -39,8 +71,6 @@ function App() {
       setError(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred")
-    } finally {
-      setLoading(false)
     }
   }
 
@@ -61,7 +91,7 @@ function App() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          window.location.href = "/"
+          setIsAuthenticated(false)
           return
         }
         throw new Error("Failed to save weight")
@@ -94,7 +124,7 @@ function App() {
 
       if (!response.ok) {
         if (response.status === 401) {
-          window.location.href = "/"
+          setIsAuthenticated(false)
           return
         }
         throw new Error("Failed to delete weight")
@@ -109,8 +139,30 @@ function App() {
     }
   }
 
+  const handleLogin = async (username: string, password: string): Promise<boolean> => {
+    try {
+      const response = await fetch("/api/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({ username, password }),
+      })
+
+      if (response.ok) {
+        await checkAuth()
+        return true
+      }
+      return false
+    } catch (err) {
+      console.error("Login failed:", err)
+      return false
+    }
+  }
+
   useEffect(() => {
-    fetchData()
+    checkAuth()
   }, [])
 
   if (loading) {
@@ -119,6 +171,10 @@ function App() {
         <div className="text-lg text-gray-600 dark:text-gray-300">Loading...</div>
       </div>
     )
+  }
+
+  if (isAuthenticated === false) {
+    return <LoginForm onLogin={handleLogin} />
   }
 
   if (error) {
