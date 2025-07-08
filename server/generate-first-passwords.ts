@@ -4,7 +4,7 @@ import { randomBytes } from "crypto"
 
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/tracker.db"
 
-function generateRandomPassword(length: number = 12): string {
+function generateRandomPassword(length: number = 20): string {
   const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
   let password = ""
 
@@ -46,6 +46,10 @@ async function generateFirstPasswords() {
   }
 
   console.log(csvData.join("\n"))
+
+  // Close database connection to allow script to exit
+  db.close()
+  process.exit(0)
 }
 
 generateFirstPasswords().catch(() => process.exit(1))
