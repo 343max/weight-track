@@ -149,11 +149,36 @@ bun run generate-first-passwords "alice,bob" > passwords.csv
 bun run generate-first-passwords "alice, bob , charlie"
 ```
 
+### Docker Container Usage
+
+When using Docker, the password management tools are available as compiled binaries inside the container:
+
+```bash
+# Get shell access to running container
+docker exec -it <container_name> sh
+
+# Use tools directly inside container
+users-without-passwords
+generate-first-passwords "alice,bob,charlie"
+
+# Or run from outside container
+docker exec <container_name> users-without-passwords
+docker exec <container_name> generate-first-passwords "alice,bob"
+
+# Save passwords to host file
+docker exec <container_name> generate-first-passwords "alice,bob" > passwords.csv
+
+# Complete workflow example
+USERS=$(docker exec <container_name> users-without-passwords)
+docker exec <container_name> generate-first-passwords "$USERS" > passwords.csv
+```
+
 ### Notes
 - Usernames are case-insensitive for login
 - Generated passwords are 20 characters long (letters and numbers)
 - Users can change their passwords after logging in via the "Password" tab
 - CSV output includes headers for easy spreadsheet import
+- In Docker containers, tools are compiled binaries (no Bun runtime needed)
 
 ## Development Commands
 
