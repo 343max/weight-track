@@ -9,7 +9,9 @@
     "dev:frontend": "vite --host",
     "build": "vite build",
     "start": "bun server/main.ts",
-    "test": "bun test"
+    "test": "bun test",
+    "generate-first-passwords": "bun run server/generate-first-passwords.ts",
+    "users-without-passwords": "bun run server/users-without-passwords.ts"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.11",

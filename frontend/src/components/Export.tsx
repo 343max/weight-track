@@ -45,7 +45,7 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
       
       if (!response.ok) {
         if (response.status === 401) {
-          window.location.href = "/"
+          window.location.reload()
           return
         }
         throw new Error("Failed to download SQLite file")

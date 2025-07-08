@@ -42,6 +42,10 @@ export default function PasswordChange() {
       })
 
       if (!response.ok) {
+        if (response.status === 401) {
+          window.location.reload()
+          return
+        }
         throw new Error("Failed to change password")
       }
 

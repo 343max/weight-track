@@ -195,79 +195,16 @@ const server = Bun.serve({
       return new Response("Not Found", { status: 404 })
     }
 
-    // Check authentication for main page
-    const userId = requireAuth(request)
-    if (!userId) {
-      // Serve login page instead of unauthorized
-      if (url.pathname === "/") {
-        const loginHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>Weight Tracker - Login</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>
-              body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; background-color: #f5f5f5; }
-              .login-form { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-              .form-group { margin-bottom: 1rem; }
-              label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
-              input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 4px; font-size: 1rem; box-sizing: border-box; }
-              button { width: 100%; padding: 0.75rem; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 1rem; cursor: pointer; }
-              button:hover { background: #0056b3; }
-              .error { color: #dc3545; margin-top: 0.5rem; }
-              .title { text-align: center; margin-bottom: 2rem; color: #333; }
-            </style>
-          </head>
-          <body>
-            <div class="login-form">
-              <h2 class="title">Weight Tracker</h2>
-              <form id="loginForm">
-                <div class="form-group">
-                  <label for="username">Username:</label>
-                  <input type="text" id="username" name="username" required>
-                </div>
-                <div class="form-group">
-                  <label for="password">Password:</label>
-                  <input type="password" id="password" name="password" required>
-                </div>
-                <button type="submit">Login</button>
-                <div id="error" class="error"></div>
-              </form>
-            </div>
-            <script>
-              document.getElementById('loginForm').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                const errorEl = document.getElementById('error');
-                
-                try {
-                  const response = await fetch('/api/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                  });
-                  
-                  if (response.ok) {
-                    window.location.reload();
-                  } else {
-                    errorEl.textContent = 'Invalid credentials';
-                  }
-                } catch (error) {
-                  errorEl.textContent = 'Login failed';
-                }
-              });
-            </script>
-          </body>
-        </html>
-        `;
-        return new Response(loginHtml, {
-          headers: { "Content-Type": "text/html" }
-        });
+    // For assets and static files, don't require authentication
+    if (url.pathname.startsWith("/assets/")) {
+      const filePath = "./dist" + url.pathname
+      if (existsSync(filePath)) {
+        const file = Bun.file(filePath)
+        return new Response(file)
       }
-      return createUnauthorizedResponse()
     }
 
+    // Always serve the React app for the root path - let the frontend handle auth
     if (url.pathname === "/") {
       if (existsSync("./dist/index.html")) {
         const file = Bun.file("./dist/index.html")
@@ -279,14 +216,6 @@ const server = Bun.serve({
           headers: { "Content-Type": "text/html" },
           status: 404,
         })
-      }
-    }
-
-    if (url.pathname.startsWith("/assets/")) {
-      const filePath = "./dist" + url.pathname
-      if (existsSync(filePath)) {
-        const file = Bun.file(filePath)
-        return new Response(file)
       }
     }
 
