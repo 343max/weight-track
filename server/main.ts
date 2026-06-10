@@ -7,11 +7,19 @@ import { existsSync } from 'fs'
 
 const DATABASE_PATH = process.env.DATABASE_PATH || './data/tracker.db'
 const PORT = process.env.PORT || 3000
+const SESSION_SECRET = process.env.SESSION_SECRET
+
+// Require SESSION_SECRET unless authentication is disabled
+if (!process.env.WITHOUT_PASSWORD && !SESSION_SECRET) {
+  console.error('FATAL: SESSION_SECRET environment variable is required when authentication is enabled.')
+  console.error('Generate one with: bun -e "console.log(require(\'crypto\').randomBytes(32).toString(\'hex\'))"')
+  process.exit(1)
+}
 
 await mkdir(dirname(DATABASE_PATH), { recursive: true })
 
 const db = new WeightTracker(DATABASE_PATH)
-const authService = new AuthService(db)
+const authService = new AuthService(db, SESSION_SECRET || 'dev-secret')
 
 function requireAuth(request: Request): number | null {
   // Skip authentication in development mode
