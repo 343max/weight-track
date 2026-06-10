@@ -1,27 +1,27 @@
-import { useState } from "react"
+import { useState } from 'react'
 
 interface LoginFormProps {
   onLogin: (username: string, password: string) => Promise<boolean>
 }
 
 export default function LoginForm({ onLogin }: LoginFormProps) {
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
+    setError('')
     setIsLoading(true)
 
     try {
       const success = await onLogin(username, password)
       if (!success) {
-        setError("Invalid credentials")
+        setError('Invalid credentials')
       }
     } catch (err) {
-      setError("Login failed")
+      setError('Login failed')
     } finally {
       setIsLoading(false)
     }
@@ -41,7 +41,10 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label htmlFor="username" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="username"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Username
               </label>
               <input
@@ -57,7 +60,10 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+              >
                 Password
               </label>
               <input
@@ -75,9 +81,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
           </div>
 
           {error && (
-            <div className="text-red-600 dark:text-red-400 text-sm text-center">
-              {error}
-            </div>
+            <div className="text-red-600 dark:text-red-400 text-sm text-center">{error}</div>
           )}
 
           <div>
@@ -86,7 +90,7 @@ export default function LoginForm({ onLogin }: LoginFormProps) {
               disabled={isLoading}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-blue-500 dark:hover:bg-blue-600"
             >
-              {isLoading ? "Signing in..." : "Sign in"}
+              {isLoading ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>

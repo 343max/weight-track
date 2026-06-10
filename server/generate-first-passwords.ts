@@ -1,12 +1,12 @@
-import { WeightTracker } from "./database"
-import { AuthService } from "./auth"
-import { randomBytes } from "crypto"
+import { WeightTracker } from './database'
+import { AuthService } from './auth'
+import { randomBytes } from 'crypto'
 
-const DATABASE_PATH = process.env.DATABASE_PATH || "./data/tracker.db"
+const DATABASE_PATH = process.env.DATABASE_PATH || './data/tracker.db'
 
 function generateRandomPassword(length: number = 20): string {
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-  let password = ""
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let password = ''
 
   for (let i = 0; i < length; i++) {
     const randomIndex = randomBytes(1)[0] % chars.length
@@ -27,8 +27,8 @@ async function generateFirstPasswords() {
   const db = new WeightTracker(DATABASE_PATH)
   const authService = new AuthService(db)
 
-  const requestedUsernames = userList.split(",").map((name) => name.trim())
-  const csvData: string[] = ["username,password"]
+  const requestedUsernames = userList.split(',').map((name) => name.trim())
+  const csvData: string[] = ['username,password']
 
   for (const username of requestedUsernames) {
     const user = db.getUserByName(username)
@@ -45,7 +45,7 @@ async function generateFirstPasswords() {
     csvData.push(`"${user.name}","${password}"`)
   }
 
-  console.log(csvData.join("\n"))
+  console.log(csvData.join('\n'))
 
   // Close database connection to allow script to exit
   db.close()

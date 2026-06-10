@@ -1,0 +1,4 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignore": ["frontend/src/style.css", "server/setup-sample-data.ts"]
+}

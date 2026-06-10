@@ -1,6 +1,6 @@
-import { createHash } from "crypto"
-import { WeightTracker } from "./database"
-import { SessionManager } from "./session"
+import { createHash } from 'crypto'
+import { WeightTracker } from './database'
+import { SessionManager } from './session'
 
 export class AuthService {
   private sessionManager: SessionManager
@@ -11,13 +11,16 @@ export class AuthService {
     this.sessionManager = new SessionManager()
 
     // Clean up expired sessions every hour
-    setInterval(() => {
-      this.sessionManager.cleanupExpiredSessions()
-    }, 60 * 60 * 1000)
+    setInterval(
+      () => {
+        this.sessionManager.cleanupExpiredSessions()
+      },
+      60 * 60 * 1000,
+    )
   }
 
   hashPassword(password: string): string {
-    return createHash("sha256").update(password).digest("hex")
+    return createHash('sha256').update(password).digest('hex')
   }
 
   async authenticate(username: string, password: string): Promise<string | null> {
@@ -46,29 +49,32 @@ export class AuthService {
   }
 
   getSessionFromRequest(request: Request): string | null {
-    const cookieHeader = request.headers.get("Cookie")
+    const cookieHeader = request.headers.get('Cookie')
     if (!cookieHeader) return null
 
-    const cookies = cookieHeader.split(";").reduce((acc, cookie) => {
-      const [key, value] = cookie.trim().split("=")
-      acc[key] = value
-      return acc
-    }, {} as Record<string, string>)
+    const cookies = cookieHeader.split(';').reduce(
+      (acc, cookie) => {
+        const [key, value] = cookie.trim().split('=')
+        acc[key] = value
+        return acc
+      },
+      {} as Record<string, string>,
+    )
 
-    return cookies["session"] || null
+    return cookies['session'] || null
   }
 
   createAuthCookie(sessionId: string): string {
     const expires = new Date()
     expires.setFullYear(expires.getFullYear() + 1) // 1 year
-    const isProduction = process.env.NODE_ENV === "production"
-    const secureFlag = isProduction ? "Secure; " : ""
+    const isProduction = process.env.NODE_ENV === 'production'
+    const secureFlag = isProduction ? 'Secure; ' : ''
     return `session=${sessionId}; HttpOnly; ${secureFlag}SameSite=Strict; Path=/; Expires=${expires.toUTCString()}`
   }
 
   createLogoutCookie(): string {
-    const isProduction = process.env.NODE_ENV === "production"
-    const secureFlag = isProduction ? "Secure; " : ""
+    const isProduction = process.env.NODE_ENV === 'production'
+    const secureFlag = isProduction ? 'Secure; ' : ''
     return `session=; HttpOnly; ${secureFlag}SameSite=Strict; Path=/; Expires=Thu, 01 Jan 1970 00:00:00 GMT`
   }
 }

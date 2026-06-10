@@ -1,5 +1,5 @@
-import { useState } from "react"
-import type { User, WeightEntry } from "../types"
+import { useState } from 'react'
+import type { User, WeightEntry } from '../types'
 
 interface ExportProps {
   users: User[]
@@ -25,7 +25,9 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
 
   const downloadJSON = () => {
     const jsonData = generateJSON()
-    const blob = new Blob([JSON.stringify(jsonData, null, 2)], { type: 'application/json;charset=utf-8;' })
+    const blob = new Blob([JSON.stringify(jsonData, null, 2)], {
+      type: 'application/json;charset=utf-8;',
+    })
     const link = document.createElement('a')
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
@@ -39,16 +41,16 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
   const downloadSQLite = async () => {
     try {
       setIsDownloading(true)
-      const response = await fetch("/api/export/sqlite", {
-        credentials: "include"
+      const response = await fetch('/api/export/sqlite', {
+        credentials: 'include',
       })
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           window.location.reload()
           return
         }
-        throw new Error("Failed to download SQLite file")
+        throw new Error('Failed to download SQLite file')
       }
 
       const blob = await response.blob()
@@ -61,8 +63,8 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
       link.click()
       document.body.removeChild(link)
     } catch (error) {
-      console.error("Failed to download SQLite file:", error)
-      alert("Fehler beim Herunterladen der Datenbankdatei")
+      console.error('Failed to download SQLite file:', error)
+      alert('Fehler beim Herunterladen der Datenbankdatei')
     } finally {
       setIsDownloading(false)
     }
@@ -72,15 +74,15 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
     const headers = ['Benutzer', 'Farbe', ...dateColumns]
     const rows = [headers.join(',')]
 
-    users.forEach(user => {
+    users.forEach((user) => {
       const row = [
         `"${user.name}"`,
         `"${user.color}"`,
-        ...dateColumns.map(date => {
+        ...dateColumns.map((date) => {
           const key = `${user.id}-${date}`
           const weight = weights[key]
           return weight ? weight.weight_kg.toString() : ''
-        })
+        }),
       ]
       rows.push(row.join(','))
     })
@@ -93,7 +95,7 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
       exportDate: new Date().toISOString(),
       users: users,
       weights: Object.values(weights),
-      dateColumns: dateColumns
+      dateColumns: dateColumns,
     }
   }
 
@@ -102,14 +104,15 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
     return date.toLocaleDateString('de-DE', {
       year: 'numeric',
       month: '2-digit',
-      day: '2-digit'
+      day: '2-digit',
     })
   }
 
   const totalEntries = Object.keys(weights).length
-  const dateRange = dateColumns.length > 0 
-    ? `${formatDate(dateColumns[0])} - ${formatDate(dateColumns[dateColumns.length - 1])}`
-    : 'Keine Daten'
+  const dateRange =
+    dateColumns.length > 0
+      ? `${formatDate(dateColumns[0])} - ${formatDate(dateColumns[dateColumns.length - 1])}`
+      : 'Keine Daten'
 
   return (
     <div className="p-4">

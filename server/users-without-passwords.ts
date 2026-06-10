@@ -1,6 +1,6 @@
-import { WeightTracker } from "./database"
+import { WeightTracker } from './database'
 
-const DATABASE_PATH = process.env.DATABASE_PATH || "./data/tracker.db"
+const DATABASE_PATH = process.env.DATABASE_PATH || './data/tracker.db'
 
 function getUsersWithoutPasswords() {
   const db = new WeightTracker(DATABASE_PATH)
@@ -8,7 +8,7 @@ function getUsersWithoutPasswords() {
   const usersWithoutPasswords = users.filter((user) => !user.password)
 
   const usernames = usersWithoutPasswords.map((user) => user.name)
-  console.log(usernames.join(","))
+  console.log(usernames.join(','))
 
   db.close()
   process.exit(0)
