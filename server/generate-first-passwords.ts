@@ -25,7 +25,7 @@ async function generateFirstPasswords() {
   }
 
   const db = new WeightTracker(DATABASE_PATH)
-  const authService = new AuthService(db)
+  const authService = new AuthService(db, 'cli-tool')
 
   const requestedUsernames = userList.split(',').map((name) => name.trim())
   const csvData: string[] = ['username,password']

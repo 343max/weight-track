@@ -1,59 +1,65 @@
-import { randomBytes } from 'crypto'
+import { createCipheriv, createDecipheriv, randomBytes, createHash } from 'crypto'
 
-export interface Session {
-  id: string
+interface SessionPayload {
   userId: number
-  createdAt: Date
-  lastAccessed: Date
+  iat: number
 }
 
 export class SessionManager {
-  private sessions: Map<string, Session> = new Map()
-  private readonly sessionTimeout = 365 * 24 * 60 * 60 * 1000 // 1 year
+  private key: Buffer
+  private readonly maxAge = 365 * 24 * 60 * 60 * 1000 // 1 year
 
-  generateSessionId(): string {
-    return randomBytes(32).toString('hex')
+  constructor(secret: string) {
+    this.key = createHash('sha256').update(secret).digest()
   }
 
   createSession(userId: number): string {
-    const sessionId = this.generateSessionId()
-    const session: Session = {
-      id: sessionId,
-      userId,
-      createdAt: new Date(),
-      lastAccessed: new Date(),
-    }
+    const iv = randomBytes(12)
+    const cipher = createCipheriv('aes-256-gcm', this.key, iv)
 
-    this.sessions.set(sessionId, session)
-    return sessionId
+    const payload: SessionPayload = { userId, iat: Date.now() }
+    const encrypted = Buffer.concat([
+      cipher.update(JSON.stringify(payload), 'utf8'),
+      cipher.final(),
+    ])
+    const authTag = cipher.getAuthTag()
+
+    // Format: iv (12) + authTag (16) + ciphertext
+    return Buffer.concat([iv, authTag, encrypted]).toString('base64url')
   }
 
-  getSession(sessionId: string): Session | null {
-    const session = this.sessions.get(sessionId)
-    if (!session) return null
+  getSession(token: string): { userId: number } | null {
+    try {
+      const buf = Buffer.from(token, 'base64url')
 
-    // Check if session is expired
-    const now = new Date()
-    if (now.getTime() - session.lastAccessed.getTime() > this.sessionTimeout) {
-      this.sessions.delete(sessionId)
+      if (buf.length < 28) return null // iv (12) + authTag (16) minimum
+
+      const iv = buf.subarray(0, 12)
+      const authTag = buf.subarray(12, 28)
+      const encrypted = buf.subarray(28)
+
+      const decipher = createDecipheriv('aes-256-gcm', this.key, iv)
+      decipher.setAuthTag(authTag)
+
+      const decrypted = Buffer.concat([
+        decipher.update(encrypted),
+        decipher.final(),
+      ]).toString('utf8')
+
+      const payload = JSON.parse(decrypted) as SessionPayload
+
+      if (typeof payload.userId !== 'number' || typeof payload.iat !== 'number') return null
+
+      // Reject expired sessions
+      if (Date.now() - payload.iat > this.maxAge) return null
+
+      return { userId: payload.userId }
+    } catch {
       return null
     }
-
-    // Update last accessed
-    session.lastAccessed = now
-    return session
   }
 
-  deleteSession(sessionId: string): void {
-    this.sessions.delete(sessionId)
-  }
-
-  cleanupExpiredSessions(): void {
-    const now = new Date()
-    for (const [sessionId, session] of this.sessions) {
-      if (now.getTime() - session.lastAccessed.getTime() > this.sessionTimeout) {
-        this.sessions.delete(sessionId)
-      }
-    }
+  deleteSession(_token: string): void {
+    // Stateless — logout is handled by clearing the cookie
   }
 }

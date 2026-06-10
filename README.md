@@ -31,11 +31,14 @@ A simple, collaborative weight tracking web application designed for a small gro
    bun install
    ```
 
-3. Set environment variables (optional):
+3. Set environment variables:
 
    ```bash
+   export SESSION_SECRET="$(bun -e "console.log(require('crypto').randomBytes(32).toString('hex'))")"
    export DATABASE_PATH="./data/tracker.db"
    ```
+
+   > **Note**: `SESSION_SECRET` is required in production. Generate a random 64-character hex string as shown above. It encrypts session cookies so users stay logged in across server restarts. In dev mode (`WITHOUT_PASSWORD=true`), it's not required.
 
 4. Set up user passwords (see Password Management section below)
 
@@ -82,10 +85,11 @@ docker-compose up -d
 
 ## Environment Variables
 
-| Variable        | Description               | Default             |
-| --------------- | ------------------------- | ------------------- |
-| `DATABASE_PATH` | SQLite database file path | `./data/tracker.db` |
-| `PORT`          | Server port               | `3000`              |
+| Variable        | Description                                    | Default             |
+| --------------- | ---------------------------------------------- | ------------------- |
+| `DATABASE_PATH` | SQLite database file path                      | `./data/tracker.db` |
+| `PORT`          | Server port                                    | `3000`              |
+| `SESSION_SECRET`| Secret key for encrypting session cookies      | Required in production |
 
 ## Database Schema
 

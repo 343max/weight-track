@@ -6,17 +6,9 @@ export class AuthService {
   private sessionManager: SessionManager
   private db: WeightTracker
 
-  constructor(db: WeightTracker) {
+  constructor(db: WeightTracker, sessionSecret: string) {
     this.db = db
-    this.sessionManager = new SessionManager()
-
-    // Clean up expired sessions every hour
-    setInterval(
-      () => {
-        this.sessionManager.cleanupExpiredSessions()
-      },
-      60 * 60 * 1000,
-    )
+    this.sessionManager = new SessionManager(sessionSecret)
   }
 
   hashPassword(password: string): string {
@@ -34,13 +26,13 @@ export class AuthService {
     return this.sessionManager.createSession(user.id)
   }
 
-  validateSession(sessionId: string): number | null {
-    const session = this.sessionManager.getSession(sessionId)
+  validateSession(token: string): number | null {
+    const session = this.sessionManager.getSession(token)
     return session ? session.userId : null
   }
 
-  logout(sessionId: string): void {
-    this.sessionManager.deleteSession(sessionId)
+  logout(token: string): void {
+    this.sessionManager.deleteSession(token)
   }
 
   changePassword(userId: number, newPassword: string): void {
