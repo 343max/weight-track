@@ -59,7 +59,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
         data: userData,
         color: user.color,
         connectNulls: false,
-        showMark: false,
+        showMark: true,
       }
     })
 
@@ -123,6 +123,16 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
               slotProps={{
                 /* @ts-expect-error */
                 legend: { hidden: true },
+              }}
+              slots={{
+                mark: (props) => (
+                  <circle
+                    cx={props.x}
+                    cy={props.y}
+                    r={3}
+                    fill={props.color}
+                  />
+                ),
               }}
               sx={{
                 "& .MuiChartsAxis-tickLabel": {
