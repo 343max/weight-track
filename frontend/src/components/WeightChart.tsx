@@ -88,7 +88,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
   const chartHeight = 400
 
   return (
-    <div className="p-4">
+    <div className="h-full overflow-y-auto p-4">
       <div className="mb-6">
         {/* User toggle buttons + range selector */}
         <div className="flex items-center justify-between gap-4 mb-4">

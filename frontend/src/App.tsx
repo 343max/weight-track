@@ -195,9 +195,9 @@ function App() {
   }
 
   return (
-    <div className="bg-white dark:bg-gray-900 min-h-screen">
+    <div className="bg-white dark:bg-gray-900 h-screen flex flex-col overflow-hidden">
       {/* Tab Bar */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+      <div className="z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
         <div className="flex space-x-8 px-6">
           <button
             onClick={() => setActiveTab('zahlen')}
@@ -246,7 +246,7 @@ function App() {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1">
+      <div className="flex-1 overflow-hidden min-h-0">
         {activeTab === 'zahlen' ? (
           <WeightTable
             users={data.users}

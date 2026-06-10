@@ -118,20 +118,19 @@ function WeightTable({
   }
 
   return (
-    <div>
-      <div>
-        <div ref={tableRef} className="overflow-y-auto bg-white dark:bg-gray-800">
+    <div className="h-full">
+      <div ref={tableRef} className="h-full overflow-y-auto bg-white dark:bg-gray-800">
           <table className="table-auto relative overflow-x-auto">
             <thead>
               <tr>
-                <th className="sticky top-0 z-10 bg-white dark:bg-gray-800 p-4 text-left font-semibold"></th>
+                <th className="sticky top-0 left-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 text-left font-semibold"></th>
                 {users.map((user, index) => (
                   <th
                     key={user.id}
-                    className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
+                    className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold backdrop-blur-sm ${
                       index % 2 === 0
-                        ? 'bg-blue-50 dark:bg-blue-900/20'
-                        : 'bg-blue-100 dark:bg-blue-800/20'
+                        ? 'bg-blue-50/80 dark:bg-blue-900/20'
+                        : 'bg-blue-100/80 dark:bg-blue-800/20'
                     }`}
                   >
                     <span className="font-bold text-sm" style={{ color: user.color }}>
@@ -144,7 +143,7 @@ function WeightTable({
             <tbody>
               {[...dateColumns].reverse().map((date) => (
                 <tr key={date}>
-                  <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 px-2 py-2 text-right">
+                  <td className="sticky left-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 py-2 text-right">
                     <span className="text-gray-800 dark:text-white text-sm font-medium">
                       {formatDate(date)}
                     </span>
@@ -172,7 +171,6 @@ function WeightTable({
               ))}
             </tbody>
           </table>
-        </div>{' '}
       </div>
     </div>
   )
