@@ -22,7 +22,7 @@ function requireAuth(request: Request): number | null {
   return authService.validateSession(sessionId)
 }
 
-const server = Bun.serve({
+Bun.serve({
   port: PORT,
   async fetch(request) {
     const url = new URL(request.url)

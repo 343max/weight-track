@@ -25,7 +25,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
     } else {
       cutoff.setMonth(now.getMonth() - 3)
     }
-    const cutoffStr = cutoff.toISOString().split('T')[0]
+    const cutoffStr = cutoff.toISOString().split('T')[0]!
     return dateColumns.filter((date) => date >= cutoffStr)
   })()
 

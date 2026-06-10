@@ -10,7 +10,6 @@ function getUsersWithoutPasswords() {
   const usernames = usersWithoutPasswords.map((user) => user.name)
   console.log(usernames.join(','))
 
-  db.close()
   process.exit(0)
 }
 

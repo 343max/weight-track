@@ -13,7 +13,7 @@ This is a simple weight tracking web application for a small group of trusted fr
 - **Database**: SQLite with two tables: `Users` and `Weights`
 - **Language**: TypeScript
 - **Data**: Use Zod to validate external json
-- **Errors**: run `bunx tsc --noEmit` to validate changes to TypeScript files
+- **Errors**: run `bun run typecheck` (tsc -b --noEmit) to validate changes to TypeScript files
 
 ## Key Architecture Points
 

@@ -99,21 +99,6 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
     }
   }
 
-  const formatDate = (dateString: string): string => {
-    const date = new Date(dateString)
-    return date.toLocaleDateString('de-DE', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    })
-  }
-
-  const totalEntries = Object.keys(weights).length
-  const dateRange =
-    dateColumns.length > 0
-      ? `${formatDate(dateColumns[0])} - ${formatDate(dateColumns[dateColumns.length - 1])}`
-      : 'Keine Daten'
-
   return (
     <div className="p-4">
       <div className="space-y-4">
