@@ -10,10 +10,24 @@ interface WeightChartProps {
 
 export default function WeightChart({ users, weights, dateColumns }: WeightChartProps) {
   const [selectedUsers, setSelectedUsers] = useState<Set<number>>(new Set(users.map((u) => u.id)))
+  const [timeRange, setTimeRange] = useState<"all" | "year" | "3months">("all")
 
   useEffect(() => {
     setSelectedUsers(new Set(users.map((u) => u.id)))
   }, [users])
+
+  const filteredDateColumns = (() => {
+    if (timeRange === "all") return dateColumns
+    const now = new Date()
+    const cutoff = new Date()
+    if (timeRange === "year") {
+      cutoff.setFullYear(now.getFullYear() - 1)
+    } else {
+      cutoff.setMonth(now.getMonth() - 3)
+    }
+    const cutoffStr = cutoff.toISOString().split("T")[0]
+    return dateColumns.filter((date) => date >= cutoffStr)
+  })()
 
   const toggleUser = (userId: number) => {
     const newSelected = new Set(selectedUsers)
@@ -47,7 +61,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
 
     // Create series data for each user
     const series = selectedUsersList.map((user) => {
-      const userData = dateColumns.map((date) => {
+      const userData = filteredDateColumns.map((date) => {
         const key = `${user.id}-${date}`
         const weight = weights[key]
         return weight ? weight.weight_kg : null
@@ -64,7 +78,7 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
     })
 
     // Create x-axis labels
-    const xLabels = dateColumns.map((date) => formatDate(date))
+    const xLabels = filteredDateColumns.map((date) => formatDate(date))
 
     return { series, xLabels }
   }
@@ -76,22 +90,39 @@ export default function WeightChart({ users, weights, dateColumns }: WeightChart
   return (
     <div className="p-4">
       <div className="mb-6">
-        {/* User toggle buttons */}
-        <div className="flex flex-wrap gap-2 mb-4">
-          {users.map((user) => (
-            <button
-              key={user.id}
-              onClick={() => toggleUser(user.id)}
-              className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
-                selectedUsers.has(user.id)
-                  ? "bg-opacity-100 text-white"
-                  : "bg-opacity-20 text-gray-600 dark:text-gray-400"
-              }`}
-              style={{ backgroundColor: selectedUsers.has(user.id) ? user.color : `${user.color}33` }}
-            >
-              {user.name}
-            </button>
-          ))}
+        {/* User toggle buttons + range selector */}
+        <div className="flex items-center justify-between gap-4 mb-4">
+          <div className="flex flex-wrap gap-2">
+            {users.map((user) => (
+              <button
+                key={user.id}
+                onClick={() => toggleUser(user.id)}
+                className={`px-3 py-1 rounded-full text-sm font-medium transition-all ${
+                  selectedUsers.has(user.id)
+                    ? "bg-opacity-100 text-white"
+                    : "bg-opacity-20 text-gray-600 dark:text-gray-400"
+                }`}
+                style={{ backgroundColor: selectedUsers.has(user.id) ? user.color : `${user.color}33` }}
+              >
+                {user.name}
+              </button>
+            ))}
+          </div>
+          <div className="flex rounded-md overflow-hidden border border-gray-300 dark:border-gray-600 shrink-0">
+            {(["all", "year", "3months"] as const).map((range) => (
+              <button
+                key={range}
+                onClick={() => setTimeRange(range)}
+                className={`px-3 py-1 text-xs font-medium transition-colors ${
+                  timeRange === range
+                    ? "bg-blue-500 text-white"
+                    : "bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+              >
+                {range === "all" ? "Alle" : range === "year" ? "1 Jahr" : "3 Monate"}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
