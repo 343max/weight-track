@@ -63,6 +63,7 @@ This is a simple weight tracking web application for a small group of trusted fr
 
 - `DATABASE_PATH` - SQLite database file path (default: `./data/tracker.db`)
 - `PORT` - Server port (default: 3000)
+- `WITHOUT_PASSWORD` - Set to `true` to skip authentication during development (already set in `dev:server` script)
 
 ## Development Notes
 

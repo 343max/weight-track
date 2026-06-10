@@ -14,6 +14,9 @@ const db = new WeightTracker(DATABASE_PATH)
 const authService = new AuthService(db)
 
 function requireAuth(request: Request): number | null {
+  // Skip authentication in development mode
+  if (process.env.WITHOUT_PASSWORD) return 1
+
   const sessionId = authService.getSessionFromRequest(request)
   if (!sessionId) return null
   return authService.validateSession(sessionId)
@@ -63,6 +66,10 @@ const server = Bun.serve({
       }
 
       if (url.pathname === "/api/change-password" && method === "POST") {
+        if (process.env.WITHOUT_PASSWORD) {
+          return new Response("Password changes disabled in dev mode", { status: 400 })
+        }
+
         const userId = requireAuth(request)
         if (!userId) {
           return new Response("Unauthorized", { status: 401 })
