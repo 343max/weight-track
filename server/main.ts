@@ -5,51 +5,18 @@ import { mkdir } from "fs/promises"
 import { dirname } from "path"
 import { existsSync } from "fs"
 
-const APP_SECRET = process.env.APP_SECRET
 const DATABASE_PATH = process.env.DATABASE_PATH || "./data/tracker.db"
 const PORT = process.env.PORT || 3000
-
-if (APP_SECRET === undefined) {
-  console.error("APP_SECRET environment variable is required (can be empty)")
-  process.exit(1)
-}
 
 await mkdir(dirname(DATABASE_PATH), { recursive: true })
 
 const db = new WeightTracker(DATABASE_PATH)
 const authService = new AuthService(db)
 
-function validateSecret(request: Request): boolean {
-  const url = new URL(request.url)
-  return url.searchParams.get("secret") === APP_SECRET
-}
-
 function requireAuth(request: Request): number | null {
   const sessionId = authService.getSessionFromRequest(request)
   if (!sessionId) return null
   return authService.validateSession(sessionId)
-}
-
-function createUnauthorizedResponse(): Response {
-  return new Response(
-    `<!DOCTYPE html>
-    <html>
-      <head>
-        <title>Unauthorized</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <style>
-          body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        </style>
-      </head>
-      <body>
-        <h1>You are not authorized</h1>
-      </body>
-    </html>`,
-    {
-      status: 401,
-      headers: { "Content-Type": "text/html" },
-    }
-  )
 }
 
 const server = Bun.serve({

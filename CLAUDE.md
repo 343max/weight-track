@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a simple weight tracking web application for a small group of trusted friends. It's designed to be minimal and collaborative with no user authentication - access is controlled by a shared secret URL parameter.
+This is a simple weight tracking web application for a small group of trusted friends. It's designed to be minimal and collaborative with session-based authentication (username + password login).
 
 ## Technical Stack
 
@@ -19,13 +19,15 @@ This is a simple weight tracking web application for a small group of trusted fr
 
 ### Access Control
 
-- Single shared secret via GET parameter: `?secret=value`
-- Server validates against `APP_SECRET` environment variable
-- No user authentication or session management
+- Session-based authentication with username + password login
+- Login via `POST /api/login` sets an HttpOnly session cookie (1 year expiry)
+- Logout via `POST /api/logout` clears the session cookie
+- All `/api/*` endpoints (except login/logout) require a valid session
+- Static assets and the root HTML are served without authentication
 
 ### Data Model
 
-- Users table: `id`, `name`, `color`
+- Users table: `id`, `name`, `color`, `password` (SHA-256 hashed)
 - Weights table: `id`, `user_id`, `date` (YYYY-MM-DD), `weight_kg`
 - Unique constraint on `(user_id, date)`
 
@@ -48,11 +50,6 @@ This is a simple weight tracking web application for a small group of trusted fr
 - Automatically creates empty columns for missing weeks
 - Rounds weight inputs to one decimal place
 
-## Environment Variables
-
-- `APP_SECRET`: Required secret token for access control
-- `DATABASE_PATH`: SQLite database file path (e.g., `./data/tracker.db`)
-
 ## Development Commands
 
 - `bun run dev` - Start both server and frontend in development mode
@@ -64,7 +61,6 @@ This is a simple weight tracking web application for a small group of trusted fr
 
 ## Environment Variables
 
-- `APP_SECRET` - Required secret token for access control
 - `DATABASE_PATH` - SQLite database file path (default: `./data/tracker.db`)
 - `PORT` - Server port (default: 3000)
 
@@ -72,6 +68,7 @@ This is a simple weight tracking web application for a small group of trusted fr
 
 - Uses Bun's built-in SQLite database (no external dependencies)
 - Frontend builds to `./dist` directory
-- Manual user management via direct database access (no UI)
-- Prioritizes simplicity over security - designed for trusted users only
-- Access via `http://localhost:3000/?secret=your_secret_here`
+- Users are managed via direct database access (no registration UI)
+- Passwords are stored as SHA-256 hashes (manual hashing needed when inserting users)
+- Session cookies are HttpOnly with SameSite=Strict (Secure in production)
+- Expired sessions are cleaned up automatically every hour
