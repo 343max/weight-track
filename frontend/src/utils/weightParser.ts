@@ -10,24 +10,24 @@ export function parseWeightInput(input: string): number | null {
 
   // Trim whitespace
   const trimmed = input.trim()
-  
+
   if (trimmed === '') {
     return null
   }
 
   // Replace comma with dot for decimal separator normalization
   const normalized = trimmed.replace(',', '.')
-  
+
   // Check for valid number format (allow digits, single dot, optional leading/trailing spaces)
   // This regex allows: 123, 123.4, .5, 0.0, etc.
   const numberRegex = /^-?\d*\.?\d+$/
-  
+
   if (!numberRegex.test(normalized)) {
     return null
   }
 
   const parsed = parseFloat(normalized)
-  
+
   // Check if parsing resulted in a valid number
   if (isNaN(parsed)) {
     return null
@@ -49,7 +49,7 @@ export function isZeroWeight(input: string): boolean {
 
   const trimmed = input.trim()
   const normalized = trimmed.replace(',', '.')
-  
+
   return normalized === '0' || normalized === '0.0' || normalized === '0,0'
 }
 

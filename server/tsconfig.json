@@ -21,19 +21,14 @@
     "noImplicitOverride": true,
 
     // Some stricter flags (disabled by default)
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": false,
 
     // Server-specific options
     "types": ["bun-types"],
     "composite": true
   },
-  "include": [
-    "*.ts",
-    "*.js"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  "include": ["*.ts", "*.js"],
+  "exclude": ["node_modules"]
 }

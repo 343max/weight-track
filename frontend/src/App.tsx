@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react"
-import WeightTable from "./components/WeightTable"
-import WeightChart from "./components/WeightChart"
-import Export from "./components/Export"
-import PasswordChange from "./components/PasswordChange"
-import LoginForm from "./components/LoginForm"
-import type { User, WeightEntry } from "./types"
-
+import { useState, useEffect } from 'react'
+import WeightTable from './components/WeightTable'
+import WeightChart from './components/WeightChart'
+import Export from './components/Export'
+import PasswordChange from './components/PasswordChange'
+import LoginForm from './components/LoginForm'
+import type { User, WeightEntry } from './types'
 
 interface AppData {
   users: User[]
@@ -17,24 +16,26 @@ function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<"zahlen" | "grafiken" | "export" | "password">("zahlen")
+  const [activeTab, setActiveTab] = useState<'zahlen' | 'grafiken' | 'export' | 'password'>(
+    'zahlen',
+  )
   const [chartKey, setChartKey] = useState(0)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
   const checkAuth = async () => {
     try {
-      const response = await fetch("/api/data", {
-        credentials: "include"
+      const response = await fetch('/api/data', {
+        credentials: 'include',
       })
-      
+
       if (response.status === 401) {
         setIsAuthenticated(false)
         setLoading(false)
         return false
       }
-      
+
       if (!response.ok) {
-        throw new Error("Failed to fetch data")
+        throw new Error('Failed to fetch data')
       }
 
       const appData = await response.json()
@@ -44,7 +45,7 @@ function App() {
       setLoading(false)
       return true
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : 'An error occurred')
       setLoading(false)
       return false
     }
@@ -52,36 +53,36 @@ function App() {
 
   const fetchData = async () => {
     if (!isAuthenticated) return
-    
+
     try {
-      const response = await fetch("/api/data", {
-        credentials: "include"
+      const response = await fetch('/api/data', {
+        credentials: 'include',
       })
-      
+
       if (!response.ok) {
         if (response.status === 401) {
           setIsAuthenticated(false)
           return
         }
-        throw new Error("Failed to fetch data")
+        throw new Error('Failed to fetch data')
       }
 
       const appData = await response.json()
       setData(appData)
       setError(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An error occurred")
+      setError(err instanceof Error ? err.message : 'An error occurred')
     }
   }
 
   const saveWeight = async (userId: number, date: string, weight: number) => {
     try {
-      const response = await fetch("/api/weight", {
-        method: "POST",
+      const response = await fetch('/api/weight', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           userId,
           date,
@@ -94,14 +95,14 @@ function App() {
           setIsAuthenticated(false)
           return
         }
-        throw new Error("Failed to save weight")
+        throw new Error('Failed to save weight')
       }
 
       const result = await response.json()
-      
+
       // Refresh data to show updated value immediately
       await fetchData()
-      
+
       return result
     } catch (err) {
       throw err
@@ -110,12 +111,12 @@ function App() {
 
   const deleteWeight = async (userId: number, date: string) => {
     try {
-      const response = await fetch("/api/weight", {
-        method: "DELETE",
+      const response = await fetch('/api/weight', {
+        method: 'DELETE',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({
           userId,
           date,
@@ -127,7 +128,7 @@ function App() {
           setIsAuthenticated(false)
           return
         }
-        throw new Error("Failed to delete weight")
+        throw new Error('Failed to delete weight')
       }
 
       // Refresh data to show updated value immediately
@@ -141,12 +142,12 @@ function App() {
 
   const handleLogin = async (username: string, password: string): Promise<boolean> => {
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
+      const response = await fetch('/api/login', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify({ username, password }),
       })
 
@@ -156,7 +157,7 @@ function App() {
       }
       return false
     } catch (err) {
-      console.error("Login failed:", err)
+      console.error('Login failed:', err)
       return false
     }
   }
@@ -199,44 +200,44 @@ function App() {
       <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
         <div className="flex space-x-8 px-6">
           <button
-            onClick={() => setActiveTab("zahlen")}
+            onClick={() => setActiveTab('zahlen')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === "zahlen"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              activeTab === 'zahlen'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Zahlen
           </button>
           <button
             onClick={() => {
-              setActiveTab("grafiken")
-              setChartKey(prev => prev + 1)
+              setActiveTab('grafiken')
+              setChartKey((prev) => prev + 1)
             }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === "grafiken"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              activeTab === 'grafiken'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Grafiken
           </button>
           <button
-            onClick={() => setActiveTab("export")}
+            onClick={() => setActiveTab('export')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === "export"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              activeTab === 'export'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Export
           </button>
           <button
-            onClick={() => setActiveTab("password")}
+            onClick={() => setActiveTab('password')}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
-              activeTab === "password"
-                ? "border-blue-500 text-blue-600 dark:text-blue-400"
-                : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300"
+              activeTab === 'password'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
             }`}
           >
             Password
@@ -246,7 +247,7 @@ function App() {
 
       {/* Tab Content */}
       <div className="flex-1">
-        {activeTab === "zahlen" ? (
+        {activeTab === 'zahlen' ? (
           <WeightTable
             users={data.users}
             weights={data.weights}
@@ -254,19 +255,15 @@ function App() {
             onSaveWeight={saveWeight}
             onDeleteWeight={deleteWeight}
           />
-        ) : activeTab === "grafiken" ? (
+        ) : activeTab === 'grafiken' ? (
           <WeightChart
             key={chartKey}
             users={data.users}
             weights={data.weights}
             dateColumns={data.dateColumns}
           />
-        ) : activeTab === "export" ? (
-          <Export
-            users={data.users}
-            weights={data.weights}
-            dateColumns={data.dateColumns}
-          />
+        ) : activeTab === 'export' ? (
+          <Export users={data.users} weights={data.weights} dateColumns={data.dateColumns} />
         ) : (
           <PasswordChange />
         )}

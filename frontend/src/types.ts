@@ -4,7 +4,7 @@ export interface User {
   color: string
 }
 
-export interface Weight {
+interface Weight {
   id: number
   user_id: number
   date: string

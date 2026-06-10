@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react"
-import type { User, WeightEntry, WeightChangeInfo } from "../types"
-import { WeightInput } from "./WeightInput"
+import { useState, useEffect, useRef } from 'react'
+import type { User, WeightEntry, WeightChangeInfo } from '../types'
+import { WeightInput } from './WeightInput'
 
 interface WeightTableProps {
   users: User[]
@@ -10,7 +10,13 @@ interface WeightTableProps {
   onDeleteWeight: (userId: number, date: string) => Promise<any>
 }
 
-function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight }: WeightTableProps) {
+function WeightTable({
+  users,
+  weights,
+  dateColumns,
+  onSaveWeight,
+  onDeleteWeight,
+}: WeightTableProps) {
   const tableRef = useRef<HTMLDivElement>(null)
   const [weightChanges, setWeightChanges] = useState<Record<string, WeightChangeInfo>>({})
   const hasScrolledRef = useRef(false)
@@ -89,13 +95,13 @@ function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight
     const dateYear = date.getFullYear()
     const dayOfWeek = date.getDay()
 
-    const day = date.getDate().toString().padStart(2, "0")
-    const month = (date.getMonth() + 1).toString().padStart(2, "0")
+    const day = date.getDate().toString().padStart(2, '0')
+    const month = (date.getMonth() + 1).toString().padStart(2, '0')
 
     // German weekday abbreviations
-    const germanWeekdays = ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"]
+    const germanWeekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
 
-    let formattedDate = ""
+    let formattedDate = ''
     if (dateYear === currentYear) {
       formattedDate = `${day}.${month}`
     } else {
@@ -123,7 +129,9 @@ function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight
                   <th
                     key={user.id}
                     className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold ${
-                      index % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
+                      index % 2 === 0
+                        ? 'bg-blue-50 dark:bg-blue-900/20'
+                        : 'bg-blue-100 dark:bg-blue-800/20'
                     }`}
                   >
                     <span className="font-bold text-sm" style={{ color: user.color }}>
@@ -137,13 +145,17 @@ function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight
               {[...dateColumns].reverse().map((date) => (
                 <tr key={date}>
                   <td className="sticky left-0 z-10 bg-white dark:bg-gray-800 px-2 py-2 text-right">
-                    <span className="text-gray-800 dark:text-white text-sm font-medium">{formatDate(date)}</span>
+                    <span className="text-gray-800 dark:text-white text-sm font-medium">
+                      {formatDate(date)}
+                    </span>
                   </td>
                   {users.map((user, userIndex) => (
                     <td
                       key={`${user.id}-${date}`}
                       className={`w-[80px] min-w-[80px] max-w-[80px] ${
-                        userIndex % 2 === 0 ? "bg-blue-50 dark:bg-blue-900/20" : "bg-blue-100 dark:bg-blue-800/20"
+                        userIndex % 2 === 0
+                          ? 'bg-blue-50 dark:bg-blue-900/20'
+                          : 'bg-blue-100 dark:bg-blue-800/20'
                       }`}
                     >
                       <WeightInput
@@ -160,7 +172,7 @@ function WeightTable({ users, weights, dateColumns, onSaveWeight, onDeleteWeight
               ))}
             </tbody>
           </table>
-        </div>{" "}
+        </div>{' '}
       </div>
     </div>
   )
