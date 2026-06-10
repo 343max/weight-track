@@ -51,7 +51,7 @@ export function generateDateColumns(existingDates: string[]): string[] {
   const allDates = [...existingDates]
 
   // Get the last date in the database
-  const lastDate = existingDates[existingDates.length - 1]
+  const lastDate = existingDates[existingDates.length - 1]!
   const lastDateObj = new Date(lastDate)
 
   // Get the current Friday (today if it's Friday, otherwise the most recent Friday)

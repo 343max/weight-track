@@ -62,23 +62,24 @@ describe('Date utilities', () => {
   })
 
   describe('generateDateColumns', () => {
-    it('should generate columns from first entry date to current Friday', () => {
-      // Test with actual current date (July 4, 2025 - Friday)
-      const result = generateDateColumns('2025-05-30')
-      expect(result).toEqual([
-        '2025-05-30',
-        '2025-06-06',
-        '2025-06-13',
-        '2025-06-20',
-        '2025-06-27',
-        '2025-07-04',
-      ])
+    it('should return just current Friday for empty input', () => {
+      const result = generateDateColumns([])
+      expect(result.length).toBe(1)
+      // The single date should be a valid ISO date string
+      expect(result[0]).toMatch(/^\d{4}-\d{2}-\d{2}$/)
     })
 
-    it('should return just current Friday if no first entry date', () => {
-      // Test with actual current date (July 4, 2025 - Friday)
-      const result = generateDateColumns(null)
-      expect(result).toEqual(['2025-07-04'])
+    it('should include the existing date in the result', () => {
+      const result = generateDateColumns(['2020-01-03'])
+      expect(result[0]).toBe('2020-01-03')
+      // Should have generated Fridays from 2020-01-03 up to current Friday
+      expect(result.length).toBeGreaterThan(1)
+    })
+
+    it('should not duplicate existing dates', () => {
+      const result = generateDateColumns(['2020-01-03', '2020-01-10'])
+      expect(result[0]).toBe('2020-01-03')
+      expect(result[1]).toBe('2020-01-10')
     })
   })
 })

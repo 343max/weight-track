@@ -52,8 +52,10 @@ async function setupSampleData() {
 
   for (let i = 0; i < dates.length; i++) {
     for (let j = 0; j < weights.length; j++) {
-      if (weights[j][i + 1] !== undefined) {
-        insertWeight.run(j + 1, dates[i], weights[j][i + 1])
+      const weightValue = weights[j]![i + 1]
+      const dateValue = dates[i]
+      if (weightValue !== undefined && dateValue !== undefined) {
+        insertWeight.run(j + 1, dateValue, weightValue)
       }
     }
   }

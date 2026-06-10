@@ -9,7 +9,7 @@ function generateRandomPassword(length: number = 20): string {
   let password = ''
 
   for (let i = 0; i < length; i++) {
-    const randomIndex = randomBytes(1)[0] % chars.length
+    const randomIndex = randomBytes(1)[0]! % chars.length
     password += chars[randomIndex]
   }
 
@@ -47,8 +47,6 @@ async function generateFirstPasswords() {
 
   console.log(csvData.join('\n'))
 
-  // Close database connection to allow script to exit
-  db.close()
   process.exit(0)
 }
 

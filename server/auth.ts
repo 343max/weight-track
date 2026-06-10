@@ -55,7 +55,7 @@ export class AuthService {
     const cookies = cookieHeader.split(';').reduce(
       (acc, cookie) => {
         const [key, value] = cookie.trim().split('=')
-        acc[key] = value
+        if (key && value) acc[key] = value
         return acc
       },
       {} as Record<string, string>,
