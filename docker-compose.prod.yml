@@ -4,14 +4,13 @@ services:
     ports:
       - "80:3000"
     environment:
-      - APP_SECRET=${APP_SECRET}
       - DATABASE_PATH=/data/tracker.db
       - PORT=3001
     volumes:
       - ./data:/data
     restart: always
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/data?secret=${APP_SECRET}"]
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
       interval: 30s
       timeout: 10s
       retries: 5

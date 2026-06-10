@@ -27,7 +27,7 @@ A small, private group of friends who trust each other with full access to the a
 #### **2.1 In-Scope Features**
 
 - A single-page web application built with React.
-- Shared access via a URL with a secret GET parameter.
+- Session-based authentication with username/password login.
 - A table-based UI displaying users and their weight entries.
 - Manual data entry and editing of weight values.
 - Automatic saving of data on input blur or after a short typing delay.
@@ -36,11 +36,9 @@ A small, private group of friends who trust each other with full access to the a
 
 #### **2.2 Out-of-Scope Features**
 
-- **User Authentication:** No individual user logins, passwords, or session management.
 - **User Management UI:** There will be no interface for creating, deleting, or editing users. This will be handled manually via direct database access.
-- **Complex Security:** The application will not have robust security measures. Access is controlled solely by the shared secret link.
 - **Advanced Analytics:** No complex charts or reporting features are required for this version.
-- **User Roles/Permissions:** All users with the link have full administrative/editing rights.
+- **User Roles/Permissions:** All authenticated users have full administrative/editing rights.
 
 ---
 
@@ -48,11 +46,11 @@ A small, private group of friends who trust each other with full access to the a
 
 #### **3.1 Access Control**
 
-- **Shared Secret Link:** Access to the application is gated by a secret token.
-- **GET Parameter:** The token must be provided as a GET parameter named `secret` in the URL.
-  - **Example:** `https://weighttracker.example/?secret=donttellanyone`
-- **Server-Side Validation:** The backend server will validate the `secret` value from the URL against a value configured via an environment variable (see section 5.3).
-- **Access Denial:** If the `secret` parameter is missing or does not match the configured value, the server should serve a simple page displaying an "You are not authorized" message.
+- **Session-Based Authentication:** Access to the application requires login with username and password.
+- **Login Endpoint:** `POST /api/login` accepts `{username, password}` and sets an HttpOnly session cookie on success.
+- **Logout Endpoint:** `POST /api/logout` clears the session cookie.
+- **Access Denial:** Protected API endpoints return a 401 status if no valid session cookie is present.
+- **Development Mode:** Setting `WITHOUT_PASSWORD=true` bypasses authentication (used in the dev script).
 
 #### **3.2 User Interface (UI) and Interaction**
 
@@ -119,7 +117,7 @@ The application shall dynamically generate the date columns based on the followi
 
 - **Backend:** A JavaScript/TypeScript application running on the **Bun** runtime. It will be responsible for:
   - Hosting the API endpoints.
-  - Validating the access secret.
+  - Authenticating users via session cookies.
   - Serving the static frontend application files.
 - **Frontend:** A Single-Page Application (SPA) developed using the **React** library.
   - **Build Tool:** **Vite** will be used for development and building.
@@ -149,5 +147,6 @@ The database will contain two primary tables:
 #### **5.3 Configuration**
 
 - Application configuration will be managed via environment variables.
-- **`APP_SECRET`**: This environment variable will store the secret token required for access control. The server should not start if this variable is not set.
 - **`DATABASE_PATH`**: This environment variable will specify the file path for the SQLite database (e.g., `./data/tracker.db`). The server will use this path to connect to the database.
+- **`PORT`**: Server port (default: `3000`).
+- **`WITHOUT_PASSWORD`**: Set to `true` to skip authentication during development.
