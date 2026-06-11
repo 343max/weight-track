@@ -128,77 +128,77 @@ function WeightTable({
   return (
     <div className="h-full">
       <div ref={tableRef} className="h-full overflow-y-auto bg-white dark:bg-gray-800">
-          <table className="table-auto relative overflow-x-auto">
-            <thead>
-              <tr className="h-12">
-                <th className="sticky top-0 left-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 text-left font-semibold"></th>
-                {users.map((user, index) => (
-                  <th
-                    key={user.id}
-                    className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold backdrop-blur-sm ${
-                      index % 2 === 0
-                        ? 'bg-blue-50/80 dark:bg-blue-900/20'
-                        : 'bg-blue-100/80 dark:bg-blue-800/20'
-                    }`}
-                  >
-                    <span className="font-bold text-sm" style={{ color: user.color }}>
-                      {user.name}
-                    </span>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {groupedByYear.map((group) => {
-                const currentYear = new Date().getFullYear()
-                return (
-                  <>
-                    {group.year !== currentYear && (
-                      <tr
-                        key={`year-${group.year}`}
-                        className="sticky"
-                        style={{ top: '3rem', zIndex: 15 }}
-                      >
-                        <td colSpan={users.length + 1} className="py-2 text-center">
-                          <span className="inline-block rounded-full px-4 py-1 mt-2 text-sm font-bold text-gray-600 dark:text-gray-300 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
-                            {group.year}
-                          </span>
+        <table className="table-auto relative overflow-x-auto">
+          <thead>
+            <tr className="h-12">
+              <th className="sticky top-0 left-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 text-left font-semibold"></th>
+              {users.map((user, index) => (
+                <th
+                  key={user.id}
+                  className={`sticky top-0 z-10 w-[80px] min-w-[80px] max-w-[80px] p-4 text-center font-semibold backdrop-blur-sm ${
+                    index % 2 === 0
+                      ? 'bg-blue-50/80 dark:bg-blue-900/20'
+                      : 'bg-blue-100/80 dark:bg-blue-800/20'
+                  }`}
+                >
+                  <span className="font-bold text-sm" style={{ color: user.color }}>
+                    {user.name}
+                  </span>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {groupedByYear.map((group) => {
+              const currentYear = new Date().getFullYear()
+              return (
+                <>
+                  {group.year !== currentYear && (
+                    <tr
+                      key={`year-${group.year}`}
+                      className="sticky"
+                      style={{ top: '3rem', zIndex: 15 }}
+                    >
+                      <td colSpan={users.length + 1} className="text-center py-2">
+                        <span className="inline-block rounded-full px-4 py-1 my-2 text-sm font-bold text-gray-600 dark:text-gray-300 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
+                          {group.year}
+                        </span>
+                      </td>
+                    </tr>
+                  )}
+                  {group.dates.map((date) => (
+                    <tr key={date}>
+                      <td className="sticky left-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 py-2 text-right">
+                        <span className="text-gray-800 dark:text-white text-sm font-medium">
+                          {formatDate(date)}
+                        </span>
+                      </td>
+                      {users.map((user, userIndex) => (
+                        <td
+                          key={`${user.id}-${date}`}
+                          className={`w-[80px] min-w-[80px] max-w-[80px] ${
+                            userIndex % 2 === 0
+                              ? 'bg-blue-50 dark:bg-blue-900/20'
+                              : 'bg-blue-100 dark:bg-blue-800/20'
+                          }`}
+                        >
+                          <WeightInput
+                            userId={user.id}
+                            date={date}
+                            initialWeight={getWeightForUserAndDate(user.id, date)}
+                            weightChangeInfo={getWeightChangeInfo(user.id, date)}
+                            onSave={handleSaveWeight}
+                            onDelete={handleDeleteWeight}
+                          />
                         </td>
-                      </tr>
-                    )}
-                    {group.dates.map((date) => (
-                      <tr key={date}>
-                        <td className="sticky left-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 py-2 text-right">
-                          <span className="text-gray-800 dark:text-white text-sm font-medium">
-                            {formatDate(date)}
-                          </span>
-                        </td>
-                        {users.map((user, userIndex) => (
-                          <td
-                            key={`${user.id}-${date}`}
-                            className={`w-[80px] min-w-[80px] max-w-[80px] ${
-                              userIndex % 2 === 0
-                                ? 'bg-blue-50 dark:bg-blue-900/20'
-                                : 'bg-blue-100 dark:bg-blue-800/20'
-                              }`}
-                          >
-                            <WeightInput
-                              userId={user.id}
-                              date={date}
-                              initialWeight={getWeightForUserAndDate(user.id, date)}
-                              weightChangeInfo={getWeightChangeInfo(user.id, date)}
-                              onSave={handleSaveWeight}
-                              onDelete={handleDeleteWeight}
-                            />
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </>
-                )
-              })}
-            </tbody>
-          </table>
+                      ))}
+                    </tr>
+                  ))}
+                </>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )
