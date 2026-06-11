@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import type { User, WeightEntry, WeightChangeInfo } from '../types'
 import { WeightInput } from './WeightInput'
 
@@ -56,6 +56,22 @@ function WeightTable({
     }
   }
 
+  const groupedByYear = useMemo(() => {
+    const groups: { year: number; dates: string[] }[] = []
+    let currentGroupYear: number | null = null
+
+    for (const date of [...dateColumns].reverse()) {
+      const year = new Date(date).getFullYear()
+      if (year !== currentGroupYear) {
+        groups.push({ year, dates: [] })
+        currentGroupYear = year
+      }
+      groups[groups.length - 1]!.dates.push(date)
+    }
+
+    return groups
+  }, [dateColumns])
+
   const getWeightForUserAndDate = (userId: number, date: string): number | null => {
     const key = `${userId}-${date}`
     const weight = weights[key]
@@ -91,8 +107,6 @@ function WeightTable({
 
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString)
-    const currentYear = new Date().getFullYear()
-    const dateYear = date.getFullYear()
     const dayOfWeek = date.getDay()
 
     const day = date.getDate().toString().padStart(2, '0')
@@ -101,13 +115,7 @@ function WeightTable({
     // German weekday abbreviations
     const germanWeekdays = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
 
-    let formattedDate = ''
-    if (dateYear === currentYear) {
-      formattedDate = `${day}.${month}`
-    } else {
-      const year = dateYear.toString().slice(-2)
-      formattedDate = `${day}.${month}.${year}`
-    }
+    let formattedDate = `${day}.${month}`
 
     // If it's not Friday (day 5), prepend the German weekday
     if (dayOfWeek !== 5) {
@@ -122,7 +130,7 @@ function WeightTable({
       <div ref={tableRef} className="h-full overflow-y-auto bg-white dark:bg-gray-800">
           <table className="table-auto relative overflow-x-auto">
             <thead>
-              <tr>
+              <tr className="h-12">
                 <th className="sticky top-0 left-0 z-20 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-4 text-left font-semibold"></th>
                 {users.map((user, index) => (
                   <th
@@ -141,34 +149,54 @@ function WeightTable({
               </tr>
             </thead>
             <tbody>
-              {[...dateColumns].reverse().map((date) => (
-                <tr key={date}>
-                  <td className="sticky left-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 py-2 text-right">
-                    <span className="text-gray-800 dark:text-white text-sm font-medium">
-                      {formatDate(date)}
-                    </span>
-                  </td>
-                  {users.map((user, userIndex) => (
-                    <td
-                      key={`${user.id}-${date}`}
-                      className={`w-[80px] min-w-[80px] max-w-[80px] ${
-                        userIndex % 2 === 0
-                          ? 'bg-blue-50 dark:bg-blue-900/20'
-                          : 'bg-blue-100 dark:bg-blue-800/20'
-                      }`}
-                    >
-                      <WeightInput
-                        userId={user.id}
-                        date={date}
-                        initialWeight={getWeightForUserAndDate(user.id, date)}
-                        weightChangeInfo={getWeightChangeInfo(user.id, date)}
-                        onSave={handleSaveWeight}
-                        onDelete={handleDeleteWeight}
-                      />
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              {groupedByYear.map((group) => {
+                const currentYear = new Date().getFullYear()
+                return (
+                  <>
+                    {group.year !== currentYear && (
+                      <tr
+                        key={`year-${group.year}`}
+                        className="sticky"
+                        style={{ top: '3rem', zIndex: 15 }}
+                      >
+                        <td colSpan={users.length + 1} className="py-2 text-center">
+                          <span className="inline-block rounded-full px-4 py-1 mt-2 text-sm font-bold text-gray-600 dark:text-gray-300 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm">
+                            {group.year}
+                          </span>
+                        </td>
+                      </tr>
+                    )}
+                    {group.dates.map((date) => (
+                      <tr key={date}>
+                        <td className="sticky left-0 z-10 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm px-2 py-2 text-right">
+                          <span className="text-gray-800 dark:text-white text-sm font-medium">
+                            {formatDate(date)}
+                          </span>
+                        </td>
+                        {users.map((user, userIndex) => (
+                          <td
+                            key={`${user.id}-${date}`}
+                            className={`w-[80px] min-w-[80px] max-w-[80px] ${
+                              userIndex % 2 === 0
+                                ? 'bg-blue-50 dark:bg-blue-900/20'
+                                : 'bg-blue-100 dark:bg-blue-800/20'
+                              }`}
+                          >
+                            <WeightInput
+                              userId={user.id}
+                              date={date}
+                              initialWeight={getWeightForUserAndDate(user.id, date)}
+                              weightChangeInfo={getWeightChangeInfo(user.id, date)}
+                              onSave={handleSaveWeight}
+                              onDelete={handleDeleteWeight}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </>
+                )
+              })}
             </tbody>
           </table>
       </div>
