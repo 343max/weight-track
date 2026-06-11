@@ -16,9 +16,15 @@ function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'zahlen' | 'grafiken' | 'export' | 'password'>(
-    'zahlen',
-  )
+  const tabs = ['zahlen', 'grafiken', 'export', 'password'] as const
+  type Tab = (typeof tabs)[number]
+
+  const getTabFromHash = (): Tab => {
+    const hash = window.location.hash.slice(1)
+    return tabs.includes(hash as Tab) ? (hash as Tab) : 'zahlen'
+  }
+
+  const [activeTab, setActiveTab] = useState<Tab>(getTabFromHash)
   const [chartKey, setChartKey] = useState(0)
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null)
 
@@ -166,6 +172,13 @@ function App() {
     checkAuth()
   }, [])
 
+  // Sync tab changes to URL hash
+  useEffect(() => {
+    const onHashChange = () => setActiveTab(getTabFromHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-white dark:bg-gray-900">
@@ -200,7 +213,9 @@ function App() {
       <div className="z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
         <div className="flex space-x-8 px-6">
           <button
-            onClick={() => setActiveTab('zahlen')}
+            onClick={() => {
+              window.location.hash = '#zahlen'
+            }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'zahlen'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -211,7 +226,7 @@ function App() {
           </button>
           <button
             onClick={() => {
-              setActiveTab('grafiken')
+              window.location.hash = '#grafiken'
               setChartKey((prev) => prev + 1)
             }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
@@ -223,7 +238,9 @@ function App() {
             Grafiken
           </button>
           <button
-            onClick={() => setActiveTab('export')}
+            onClick={() => {
+              window.location.hash = '#export'
+            }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'export'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
@@ -233,7 +250,9 @@ function App() {
             Export
           </button>
           <button
-            onClick={() => setActiveTab('password')}
+            onClick={() => {
+              window.location.hash = '#password'
+            }}
             className={`py-4 px-1 border-b-2 font-medium text-sm ${
               activeTab === 'password'
                 ? 'border-blue-500 text-blue-600 dark:text-blue-400'
