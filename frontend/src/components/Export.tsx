@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import type { User, WeightEntry } from '../types'
 
 interface ExportProps {
@@ -8,7 +7,6 @@ interface ExportProps {
 }
 
 export default function Export({ users, weights, dateColumns }: ExportProps) {
-  const [isDownloading, setIsDownloading] = useState(false)
 
   const downloadCSV = () => {
     const csvData = generateCSV()
@@ -36,38 +34,6 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
-  }
-
-  const downloadSQLite = async () => {
-    try {
-      setIsDownloading(true)
-      const response = await fetch('/api/export/sqlite', {
-        credentials: 'include',
-      })
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          window.location.reload()
-          return
-        }
-        throw new Error('Failed to download SQLite file')
-      }
-
-      const blob = await response.blob()
-      const link = document.createElement('a')
-      const url = URL.createObjectURL(blob)
-      link.setAttribute('href', url)
-      link.setAttribute('download', `weight-tracker-${new Date().toISOString().split('T')[0]}.db`)
-      link.style.visibility = 'hidden'
-      document.body.appendChild(link)
-      link.click()
-      document.body.removeChild(link)
-    } catch (error) {
-      console.error('Failed to download SQLite file:', error)
-      alert('Fehler beim Herunterladen der Datenbankdatei')
-    } finally {
-      setIsDownloading(false)
-    }
   }
 
   const generateCSV = (): string => {
@@ -116,15 +82,6 @@ export default function Export({ users, weights, dateColumns }: ExportProps) {
           className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-lg font-medium transition-colors text-lg"
         >
           JSON herunterladen
-        </button>
-
-        {/* SQLite Database Export */}
-        <button
-          onClick={downloadSQLite}
-          disabled={isDownloading}
-          className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white px-6 py-4 rounded-lg font-medium transition-colors text-lg"
-        >
-          {isDownloading ? 'Lädt...' : 'SQLite herunterladen'}
         </button>
       </div>
     </div>
