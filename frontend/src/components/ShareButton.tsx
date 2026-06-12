@@ -88,7 +88,6 @@ export function ShareButton({
       const file = new File([await blob], 'weight.png', { type: 'image/png' })
       await navigator.share({
         files: [file],
-        title: 'Weight',
       })
       dismiss()
     } catch (err) {}
