@@ -212,8 +212,8 @@ function App() {
   return (
     <div className="bg-white dark:bg-gray-900 h-screen flex flex-col overflow-hidden">
       {/* Tab Bar */}
-      <div className="z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0">
-        <div className="flex space-x-8 px-6">
+      <div className="z-50 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 shrink-0 overflow-x-auto scrollbar-hide">
+        <div className="flex space-x-8 px-6 whitespace-nowrap">
           <button
             onClick={() => {
               window.location.hash = '#zahlen'
