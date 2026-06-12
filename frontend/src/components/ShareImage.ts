@@ -15,27 +15,6 @@ function hexToRgba(hex: string, alpha: number): string {
   return `rgba(${r},${g},${b},${alpha})`
 }
 
-function drawRoundedRect(
-  ctx: CanvasRenderingContext2D,
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-) {
-  ctx.beginPath()
-  ctx.moveTo(x + r, y)
-  ctx.lineTo(x + w - r, y)
-  ctx.arcTo(x + w, y, x + w, y + r, r)
-  ctx.lineTo(x + w, y + h - r)
-  ctx.arcTo(x + w, y + h, x + w - r, y + h, r)
-  ctx.lineTo(x + r, y + h)
-  ctx.arcTo(x, y + h, x, y + h - r, r)
-  ctx.lineTo(x, y + r)
-  ctx.arcTo(x, y, x + r, y, r)
-  ctx.closePath()
-}
-
 export async function generateShareImage(
   weight: number,
   change: number,
@@ -45,8 +24,6 @@ export async function generateShareImage(
   const scale = 2
   const W = 600 * scale
   const H = 340 * scale
-  const radius = 32 * scale
-
   const canvas = document.createElement('canvas')
   canvas.width = W
   canvas.height = H
@@ -55,8 +32,7 @@ export async function generateShareImage(
   // -- Background --
   const dark = isDarkMode()
   ctx.fillStyle = dark ? '#1f2937' : '#ffffff'
-  drawRoundedRect(ctx, 0, 0, W, H, radius)
-  ctx.fill()
+  ctx.fillRect(0, 0, W, H)
 
   // -- Sparkline --
   const sparklineData = entries.length === 0 ? [weight] : entries
