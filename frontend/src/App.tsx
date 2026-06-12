@@ -4,6 +4,7 @@ import WeightChart from './components/WeightChart'
 import Export from './components/Export'
 import PasswordChange from './components/PasswordChange'
 import LoginForm from './components/LoginForm'
+import DebugShare from './components/DebugShare'
 import type { User, WeightEntry } from './types'
 
 interface AppData {
@@ -16,7 +17,7 @@ function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const tabs = ['zahlen', 'grafiken', 'export', 'password'] as const
+  const tabs = ['zahlen', 'grafiken', 'export', 'password', 'debug'] as const
   type Tab = (typeof tabs)[number]
 
   const getTabFromHash = (): Tab => {
@@ -283,6 +284,8 @@ function App() {
           />
         ) : activeTab === 'export' ? (
           <Export users={data.users} weights={data.weights} dateColumns={data.dateColumns} />
+        ) : activeTab === 'debug' ? (
+          <DebugShare />
         ) : (
           <PasswordChange />
         )}

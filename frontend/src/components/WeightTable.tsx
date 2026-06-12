@@ -28,6 +28,17 @@ function WeightTable({
     }
   }, [dateColumns])
 
+  const latestDate = dateColumns[dateColumns.length - 1] ?? ''
+
+  const getRecentEntries = (userId: number): number[] => {
+    return Object.values(weights)
+      .filter((w) => w.user_id === userId)
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 4)
+      .reverse()
+      .map((w) => w.weight_kg)
+  }
+
   const handleSaveWeight = async (userId: number, date: string, weight: number) => {
     try {
       const result = await onSaveWeight(userId, date, weight)
@@ -189,6 +200,9 @@ function WeightTable({
                             weightChangeInfo={getWeightChangeInfo(user.id, date)}
                             onSave={handleSaveWeight}
                             onDelete={handleDeleteWeight}
+                            isLatestColumn={date === latestDate}
+                            user={user}
+                            recentEntries={getRecentEntries(user.id)}
                           />
                         </td>
                       ))}
