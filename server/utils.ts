@@ -22,6 +22,13 @@ export function getLastFriday(date: Date = new Date()): string {
   return friday.toISOString().split('T')[0]!
 }
 
+export function getWindowStart(endDate: string, weeks: number): string {
+  const end = new Date(endDate)
+  const start = new Date(end)
+  start.setDate(end.getDate() - weeks * 7)
+  return start.toISOString().split('T')[0]!
+}
+
 export function getAllFridaysBetween(startDate: string, endDate: string): string[] {
   const start = new Date(startDate)
   const end = new Date(endDate)

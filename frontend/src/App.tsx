@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import WeightTable from './components/WeightTable'
 import WeightChart from './components/WeightChart'
+import Ranking from './components/Ranking'
 import Export from './components/Export'
 import PasswordChange from './components/PasswordChange'
 import LoginForm from './components/LoginForm'
@@ -17,7 +18,7 @@ function App() {
   const [data, setData] = useState<AppData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const tabs = ['zahlen', 'grafiken', 'export', 'password', 'debug'] as const
+  const tabs = ['zahlen', 'ranking', 'grafiken', 'export', 'password', 'debug'] as const
   type Tab = (typeof tabs)[number]
 
   const getTabFromHash = (): Tab => {
@@ -227,6 +228,18 @@ function App() {
           </button>
           <button
             onClick={() => {
+              window.location.hash = '#ranking'
+            }}
+            className={`py-4 px-1 border-b-2 font-medium text-sm ${
+              activeTab === 'ranking'
+                ? 'border-blue-500 text-blue-600 dark:text-blue-400'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+            }`}
+          >
+            Ranking
+          </button>
+          <button
+            onClick={() => {
               window.location.hash = '#grafiken'
               setChartKey((prev) => prev + 1)
             }}
@@ -275,6 +288,8 @@ function App() {
             onSaveWeight={saveWeight}
             onDeleteWeight={deleteWeight}
           />
+        ) : activeTab === 'ranking' ? (
+          <Ranking />
         ) : activeTab === 'grafiken' ? (
           <WeightChart
             key={chartKey}

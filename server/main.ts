@@ -1,5 +1,5 @@
 import { WeightTracker } from './database'
-import { generateDateColumns } from './utils'
+import { generateDateColumns, getWindowStart } from './utils'
 import { AuthService } from './auth'
 import { mkdir } from 'fs/promises'
 import { dirname } from 'path'
@@ -158,6 +158,68 @@ Bun.serve({
         } else {
           return new Response('Weight not found', { status: 404 })
         }
+      }
+
+      if (url.pathname === '/api/ranking' && method === 'GET') {
+        const users = db.getAllUsers().map(({ password, ...user }) => user)
+        const allWeights = db.getAllWeights()
+        const allDates = db.getAllDates()
+
+        if (allDates.length === 0) {
+          return Response.json({ weeks12: [], weeks24: [], weeks52: [], allTime: [] })
+        }
+
+        const latestDate = allDates[allDates.length - 1]!
+
+        function computeRanking(windowStart: string | null) {
+          const entries: {
+            userId: number
+            userName: string
+            userColor: string
+            startWeight: number
+            endWeight: number
+            deltaKg: number
+          }[] = []
+
+          for (const user of users) {
+            const userWeights = allWeights
+              .filter((w) => w.user_id === user.id)
+              .sort((a, b) => a.date.localeCompare(b.date))
+
+            if (userWeights.length < 2) continue
+
+            const startEntry = windowStart
+              ? userWeights.find((w) => w.date >= windowStart)
+              : userWeights[0]
+
+            if (!startEntry) continue
+
+            const endEntry = userWeights[userWeights.length - 1]!
+
+            if (startEntry.date === endEntry.date) continue
+
+            const deltaKg = Math.round((endEntry.weight_kg - startEntry.weight_kg) * 10) / 10
+
+            entries.push({
+              userId: user.id,
+              userName: user.name,
+              userColor: user.color,
+              startWeight: startEntry.weight_kg,
+              endWeight: endEntry.weight_kg,
+              deltaKg,
+            })
+          }
+
+          entries.sort((a, b) => a.deltaKg - b.deltaKg)
+          return entries
+        }
+
+        return Response.json({
+          weeks12: computeRanking(getWindowStart(latestDate, 12)),
+          weeks24: computeRanking(getWindowStart(latestDate, 24)),
+          weeks52: computeRanking(getWindowStart(latestDate, 52)),
+          allTime: computeRanking(null),
+        })
       }
 
       return new Response('Not Found', { status: 404 })
