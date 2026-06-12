@@ -39,13 +39,7 @@ const SECTION_LABELS: Record<(typeof SECTION_ORDER)[number], string> = {
   allTime: 'All Time',
 }
 
-function RankingTable({
-  label,
-  entries,
-}: {
-  label: string
-  entries: RankingData['weeks12']
-}) {
+function RankingTable({ label, entries }: { label: string; entries: RankingData['weeks12'] }) {
   const ranks = rankWithTies(entries)
 
   if (entries.length === 0) {
@@ -64,31 +58,28 @@ function RankingTable({
         <table className="w-full text-sm">
           <thead>
             <tr className="bg-gray-50 dark:bg-gray-800/50">
-              <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-400 w-12">
-                #
-              </th>
-              <th className="px-4 py-2 text-left font-medium text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400 "></th>
+              <th className="px-3 py-2 text-left font-medium text-gray-600 dark:text-gray-400">
                 User
               </th>
-              <th className="px-4 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
                 Start
               </th>
-              <th className="px-4 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
                 Ende
               </th>
-              <th className="px-4 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
+              <th className="px-3 py-2 text-right font-medium text-gray-600 dark:text-gray-400">
                 Δ kg
               </th>
             </tr>
           </thead>
           <tbody>
             {entries.map((entry, i) => (
-              <tr
-                key={entry.userId}
-                className="border-t border-gray-100 dark:border-gray-700/50"
-              >
-                <td className="px-4 py-2 text-center text-gray-800 dark:text-gray-200">{ranks[i]}</td>
-                <td className="px-4 py-2">
+              <tr key={entry.userId} className="border-t border-gray-100 dark:border-gray-700/50">
+                <td className="pl-2 py-2 text-center text-gray-800 dark:text-gray-200">
+                  {ranks[i]}
+                </td>
+                <td className="px-3 py-2">
                   <span className="flex items-center gap-2">
                     <span
                       className="inline-block w-3 h-3 rounded-full shrink-0"
@@ -97,14 +88,14 @@ function RankingTable({
                     <span className="text-gray-800 dark:text-gray-200">{entry.userName}</span>
                   </span>
                 </td>
-                <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400 tabular-nums">
+                <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-400 tabular-nums">
                   {entry.startWeight.toFixed(1)}
                 </td>
-                <td className="px-4 py-2 text-right text-gray-600 dark:text-gray-400 tabular-nums">
+                <td className="px-3 py-2 text-right text-gray-600 dark:text-gray-400 tabular-nums">
                   {entry.endWeight.toFixed(1)}
                 </td>
                 <td
-                  className={`px-4 py-2 text-right tabular-nums font-medium ${
+                  className={`px-3 py-2 text-right tabular-nums font-medium ${
                     entry.deltaKg < 0
                       ? 'text-green-600 dark:text-green-400'
                       : entry.deltaKg > 0
