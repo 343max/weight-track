@@ -161,7 +161,7 @@ export default function Ranking() {
   }
 
   return (
-    <div className="h-full overflow-y-auto p-6 bg-white dark:bg-gray-900">
+    <div className="h-full overflow-y-auto p-4 bg-white dark:bg-gray-900">
       <div className="max-w-2xl mx-auto">
         {SECTION_ORDER.map((key) => (
           <RankingTable key={key} label={SECTION_LABELS[key]} entries={data[key]} />
