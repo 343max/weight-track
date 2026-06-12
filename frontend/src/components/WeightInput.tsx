@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
-import type { WeightChangeInfo } from '../types'
+import type { User, WeightChangeInfo } from '../types'
 import { parseWeightInput, isZeroWeight, isValidWeight } from '../utils/weightParser'
+import { ShareButton } from './ShareButton'
 
 interface WeightInputProps {
   userId: number
@@ -9,6 +10,9 @@ interface WeightInputProps {
   weightChangeInfo: WeightChangeInfo | null
   onSave: (userId: number, date: string, weight: number) => Promise<WeightChangeInfo>
   onDelete: (userId: number, date: string) => Promise<void>
+  isLatestColumn: boolean
+  user: User
+  recentEntries: number[]
 }
 
 export function WeightInput({
@@ -18,13 +22,18 @@ export function WeightInput({
   weightChangeInfo,
   onSave,
   onDelete,
+  isLatestColumn,
+  user,
+  recentEntries,
 }: WeightInputProps) {
   const [value, setValue] = useState(initialWeight?.toString() || '')
   const [isEditing, setIsEditing] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [showShare, setShowShare] = useState(false)
   const [displayInfo, setDisplayInfo] = useState<WeightChangeInfo | null>(null)
   const inputRef = useRef<HTMLInputElement>(null)
-  const saveTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+  const cellRef = useRef<HTMLDivElement>(null)
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const lastValidValueRef = useRef<string>('')
 
   useEffect(() => {
@@ -40,7 +49,7 @@ export function WeightInput({
     }
   }, [weightChangeInfo])
 
-  const handleSave = async (weightValue: string) => {
+  const handleSave = async (weightValue: string): Promise<WeightChangeInfo | null> => {
     setIsSaving(true)
     try {
       if (!weightValue || weightValue.trim() === '') {
@@ -50,19 +59,21 @@ export function WeightInput({
           setDisplayInfo(null)
           lastValidValueRef.current = ''
         }
-        return
+        return null
       }
 
       const numericValue = parseWeightInput(weightValue)
       if (numericValue === null || numericValue <= 0) {
-        return
+        return null
       }
 
       const result = await onSave(userId, date, numericValue)
       setDisplayInfo(result)
       lastValidValueRef.current = numericValue.toString()
+      return result
     } catch (error) {
       console.error('Failed to save/delete weight:', error)
+      return null
     } finally {
       setIsSaving(false)
     }
@@ -81,8 +92,9 @@ export function WeightInput({
     }, 2000)
   }
 
-  const handleBlur = () => {
+  const handleBlur = async () => {
     setIsEditing(false)
+    setShowShare(false)
 
     if (saveTimeoutRef.current) {
       clearTimeout(saveTimeoutRef.current)
@@ -97,7 +109,7 @@ export function WeightInput({
     // Handle explicit "0" as deletion request
     if (isZeroWeight(value)) {
       if (initialWeight !== null) {
-        handleSave('') // Trigger deletion
+        await handleSave('') // Trigger deletion
       } else {
         setValue(lastValidValueRef.current) // Dismiss if no existing weight
       }
@@ -110,7 +122,12 @@ export function WeightInput({
       return
     }
 
-    handleSave(value)
+    const result = await handleSave(value)
+
+    // Show share button only for latest column with a previous weight entry.
+    if (result && result.previousWeight && isLatestColumn) {
+      setShowShare(true)
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -155,6 +172,7 @@ export function WeightInput({
   }
 
   const handleClick = () => {
+    setShowShare(false)
     setIsEditing(true)
     setTimeout(() => {
       if (inputRef.current) {
@@ -185,11 +203,27 @@ export function WeightInput({
   }
 
   return (
-    <div className="text-center p-2" onClick={handleClick}>
-      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
-        {initialWeight !== null ? initialWeight.toFixed(1) : '--'}
+    <>
+      {showShare && (
+        <ShareButton
+          weight={initialWeight ?? 0}
+          change={
+            displayInfo && displayInfo.previousWeight
+              ? displayInfo.weight.weight_kg - displayInfo.previousWeight.weight_kg
+              : 0
+          }
+          entries={recentEntries}
+          color={user.color}
+          onDismiss={() => setShowShare(false)}
+          anchorRef={cellRef}
+        />
+      )}
+      <div ref={cellRef} className="text-center p-2 relative" onClick={handleClick}>
+        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
+          {initialWeight !== null ? initialWeight.toFixed(1) : '--'}
+        </div>
+        {renderWeightChange()}
       </div>
-      {renderWeightChange()}
-    </div>
+    </>
   )
 }
