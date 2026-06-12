@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'bun:test'
-import { getLastFriday, getAllFridaysBetween, generateDateColumns } from './utils'
+import { getLastFriday, getAllFridaysBetween, generateDateColumns, getWindowStart } from './utils'
 
 describe('Date utilities', () => {
   describe('getLastFriday', () => {
@@ -36,6 +36,54 @@ describe('Date utilities', () => {
     it('should return previous Friday if given date is Thursday', () => {
       const thursday = new Date('2024-07-11') // Thursday
       expect(getLastFriday(thursday)).toBe('2024-07-05')
+    })
+  })
+
+  describe('getWindowStart', () => {
+    it('should return previous Friday when end date is Friday and window is 1 week', () => {
+      // 2025-07-04 is a Friday
+      const result = getWindowStart('2025-07-04', 1)
+      expect(result).toBe('2025-06-27') // previous Friday
+    })
+
+    it('should return 4 weeks before when window is 4 weeks', () => {
+      const result = getWindowStart('2025-07-04', 4)
+      expect(result).toBe('2025-06-06') // 4 Fridays back
+    })
+
+    it('should handle crossing month boundaries', () => {
+      // 2025-03-07 is a Friday
+      const result = getWindowStart('2025-03-07', 2)
+      expect(result).toBe('2025-02-21') // crosses into February
+    })
+
+    it('should handle crossing year boundaries', () => {
+      // 2025-01-10 is a Friday
+      const result = getWindowStart('2025-01-10', 4)
+      expect(result).toBe('2024-12-13') // crosses into December 2024
+    })
+
+    it('should return same date for 0 weeks', () => {
+      const result = getWindowStart('2025-07-04', 0)
+      expect(result).toBe('2025-07-04')
+    })
+
+    it('should handle 52 weeks (full year)', () => {
+      // 2025-07-04 is a Friday, 52 weeks back is 2024-07-05 (also Friday)
+      const result = getWindowStart('2025-07-04', 52)
+      expect(result).toBe('2024-07-05')
+    })
+
+    it('should handle today being Friday with 1 week window', () => {
+      // Use getLastFriday to get a real "today is Friday" date
+      const today = new Date()
+      const todayFriday = getLastFriday(today)
+      const result = getWindowStart(todayFriday, 1)
+
+      // Result should be exactly 7 days before
+      const expected = new Date(todayFriday)
+      expected.setDate(expected.getDate() - 7)
+      expect(result).toBe(expected.toISOString().split('T')[0]!)
     })
   })
 
