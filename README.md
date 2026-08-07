@@ -127,7 +127,20 @@ All protected endpoints require a valid session cookie.
 
 ## Password Management
 
-The application includes several scripts for managing user passwords:
+### Adding a New User
+
+```bash
+# Add a user with a random color and auto-generated password
+bun run add-user "Alice"
+
+# Add a user with a specific color
+bun run add-user "Bob" "#4ECDC4"
+
+# Add a user with a specific color and password
+bun run add-user "Charlie" "#45B7D1" "mypassword"
+```
+
+The command outputs the generated password (if not provided) and a CSV line you can save.
 
 ### Check Users Without Passwords
 
@@ -165,24 +178,30 @@ bun run generate-first-passwords "alice, bob , charlie"
 
 ### Docker Container Usage
 
-When using Docker, the password management tools are available as compiled binaries inside the container:
+When using Docker, user management tools are available as compiled binaries inside the container:
 
 ```bash
 # Get shell access to running container
 docker exec -it <container_name> sh
 
 # Use tools directly inside container
+add-user "Alice"
+add-user "Bob" "#4ECDC4" "mypassword"
 users-without-passwords
 generate-first-passwords "alice,bob,charlie"
 
 # Or run from outside container
+docker exec <container_name> add-user "Alice"
 docker exec <container_name> users-without-passwords
 docker exec <container_name> generate-first-passwords "alice,bob"
 
 # Save passwords to host file
 docker exec <container_name> generate-first-passwords "alice,bob" > passwords.csv
 
-# Complete workflow example
+# Complete workflow: add a new user
+docker exec <container_name> add-user "Dave" "#F8C471"
+
+# Complete workflow: get users without passwords and generate them
 USERS=$(docker exec <container_name> users-without-passwords)
 docker exec <container_name> generate-first-passwords "$USERS" > passwords.csv
 ```
@@ -216,9 +235,10 @@ bun run start
 # Create sample data for testing
 bun setup-sample-data.ts
 
-# Password management
-bun run users-without-passwords          # List users without passwords
-bun run generate-first-passwords "users" # Generate passwords for specific users
+# User management
+bun run add-user "name" [color] [password]  # Create a new user
+bun run users-without-passwords              # List users without passwords
+bun run generate-first-passwords "users"     # Generate passwords for specific users
 ```
 
 ## Contributing

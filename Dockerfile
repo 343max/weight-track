@@ -20,6 +20,7 @@ RUN bun build server/main.ts --compile --outfile weight-tracker
 # Build password management tools as binaries
 RUN bun build server/generate-first-passwords.ts --compile --outfile generate-first-passwords
 RUN bun build server/users-without-passwords.ts --compile --outfile users-without-passwords
+RUN bun build server/add-user.ts --compile --outfile add-user
 
 # Install Caddy on a base that supports Bun binaries
 FROM debian:12-slim AS runtime
@@ -43,6 +44,7 @@ COPY --from=base /app/dist /var/www/html
 COPY --from=base /app/weight-tracker /usr/local/bin/weight-tracker
 COPY --from=base /app/generate-first-passwords /usr/local/bin/generate-first-passwords
 COPY --from=base /app/users-without-passwords /usr/local/bin/users-without-passwords
+COPY --from=base /app/add-user /usr/local/bin/add-user
 
 # Copy Caddyfile
 COPY Caddyfile /etc/caddy/Caddyfile

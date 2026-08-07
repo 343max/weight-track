@@ -10,6 +10,7 @@
     "start": "bun server/main.ts",
     "test": "bun test",
     "typecheck": "tsc -b --noEmit",
+    "add-user": "bun run server/add-user.ts",
     "generate-first-passwords": "bun run server/generate-first-passwords.ts",
     "users-without-passwords": "bun run server/users-without-passwords.ts",
     "format": "prettier --write .",
