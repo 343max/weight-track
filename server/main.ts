@@ -179,6 +179,7 @@ Bun.serve({
             startWeight: number
             endWeight: number
             deltaKg: number
+            deltaPercent: number
           }[] = []
 
           for (const user of users) {
@@ -198,7 +199,9 @@ Bun.serve({
 
             if (startEntry.date === endEntry.date) continue
 
-            const deltaKg = Math.round((endEntry.weight_kg - startEntry.weight_kg) * 10) / 10
+            const rawDelta = endEntry.weight_kg - startEntry.weight_kg
+            const deltaKg = Math.round(rawDelta * 10) / 10
+            const deltaPercent = Math.round((rawDelta / startEntry.weight_kg) * 1000) / 10
 
             entries.push({
               userId: user.id,
@@ -207,6 +210,7 @@ Bun.serve({
               startWeight: startEntry.weight_kg,
               endWeight: endEntry.weight_kg,
               deltaKg,
+              deltaPercent,
             })
           }
 
