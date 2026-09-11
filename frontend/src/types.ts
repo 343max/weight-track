@@ -28,6 +28,7 @@ export interface RankingEntry {
   startWeight: number
   endWeight: number
   deltaKg: number
+  deltaPercent: number
 }
 
 export interface RankingData {
